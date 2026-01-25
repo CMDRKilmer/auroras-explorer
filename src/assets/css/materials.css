@@ -1,0 +1,177 @@
+.material-tile {
+	text-shadow: rgb(34, 34, 34) 1px 1px;
+
+	/* Material Tile color settings for unknown materials. */
+	background: linear-gradient(135deg, #000000, #191919);
+	color: #7f7f7f;
+}
+
+.material-category-agricultural-products {
+	background: linear-gradient(135deg, #003800, #0a4708);
+	color: #8bb37b;
+}
+
+.material-category-alloys {
+	background: linear-gradient(135deg, #7b4c1e, #946537);
+	color: #facb9d;
+}
+
+.material-category-chemicals {
+	background: linear-gradient(135deg, #b72e5b, #d04774);
+	color: #ffadda;
+}
+
+.material-category-construction-materials {
+	background: linear-gradient(135deg, #185bd3, #3174ec);
+	color: #97daff;
+}
+
+.material-category-construction-parts {
+	background: linear-gradient(135deg, #294d6b, #426684);
+	color: #a8ccea;
+}
+
+.material-category-construction-prefabs {
+	background: linear-gradient(135deg, #0f1e62, #28377b);
+	color: #8e9de1;
+}
+
+.material-category-consumable-bundles {
+	background: linear-gradient(135deg, #3e0a11, #57232a);
+	color: #bd8990;
+}
+
+.material-category-consumables-basic {
+	background: linear-gradient(135deg, #a62c2a, #ba363c);
+	color: #ff989e;
+}
+
+.material-category-consumables-luxury {
+	background: linear-gradient(135deg, #680000, #7b0012);
+	color: #db9191;
+}
+
+.material-category-drones {
+	background: linear-gradient(135deg, #8c3412, #a54d2b);
+	color: #ffb391;
+}
+
+.material-category-electronic-devices {
+	background: linear-gradient(135deg, #561493, #6f2dac);
+	color: #d593ff;
+}
+
+.material-category-electronic-parts {
+	background: linear-gradient(135deg, #5b2eb7, #7447d0);
+	color: #daadff;
+}
+
+.material-category-electronic-pieces {
+	background: linear-gradient(135deg, #7752bd, #906bd6);
+	color: #f6d1ff;
+}
+
+.material-category-electronic-systems {
+	background: linear-gradient(135deg, #331a4c, #4c3365);
+	color: #b299cb;
+}
+
+.material-category-elements {
+	background: linear-gradient(135deg, #3d2e20, #564739);
+	color: #bcad9f;
+}
+
+.material-category-energy-systems {
+	background: linear-gradient(135deg, #153e27, #2e5740);
+	color: #94bda6;
+}
+
+.material-category-fuels {
+	background: linear-gradient(135deg, #548d22, #6ba23c);
+	color: #cbfaa3;
+}
+
+.material-category-gases {
+	background: linear-gradient(135deg, #00696b, #198284);
+	color: #7fe8ea;
+}
+
+.material-category-liquids {
+	background: linear-gradient(135deg, #67a8da, #6098c3);
+	color: #f1ffff;
+}
+
+.material-category-medical-equipment {
+	background: linear-gradient(135deg, #55aa55, #6ec36e);
+	color: #d4ffd4;
+}
+
+.material-category-metals {
+	background: linear-gradient(135deg, #363636, #4f4f4f);
+	color: #b5b5b5;
+}
+
+.material-category-minerals {
+	background: linear-gradient(135deg, #997149, #b28a62);
+	color: #fff0c8;
+}
+
+.material-category-ores {
+	background: linear-gradient(135deg, #525761, #6b707a);
+	color: #d1d6e0;
+}
+
+.material-category-plastics {
+	background: linear-gradient(135deg, #791f62, #92387b);
+	color: #f89ee1;
+}
+
+.material-category-ship-engines {
+	background: linear-gradient(135deg, #992900, #b24219);
+	color: #ffa87f;
+}
+
+.material-category-ship-kits {
+	background: linear-gradient(135deg, #995400, #b26d19);
+	color: #ffd37f;
+}
+
+.material-category-ship-parts {
+	background: linear-gradient(135deg, #996300, #b27c19);
+	color: #ffe27f;
+}
+
+.material-category-ship-shields {
+	background: linear-gradient(135deg, #bf740a, #d98c21);
+	color: #dbdb79;
+}
+
+.material-category-software-components {
+	background: linear-gradient(135deg, #88792f, #a19248);
+	color: #fff8ae;
+}
+
+.material-category-software-systems {
+	background: linear-gradient(135deg, #3c3505, #554e1e);
+	color: #bbb484;
+}
+
+.material-category-software-tools {
+	background: linear-gradient(135deg, #816213, #9a7b2c);
+	color: #ffe192;
+}
+
+.material-category-textiles {
+	background: linear-gradient(135deg, #525a21, #6b733a);
+	color: #d1d9a0;
+}
+
+.material-category-unit-prefabs {
+	background: linear-gradient(135deg, #1d1b1c, #363435);
+	color: #9c9a9b;
+}
+
+.material-category-utility {
+	background: linear-gradient(135deg, #a19488, #baada1);
+	color: #ffffff;
+}

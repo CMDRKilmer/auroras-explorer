@@ -1,5 +1,6 @@
-import assert from 'node:assert'
-import { DataStore } from './data_store'
+import { assert } from './assert'
+import type { DataStore } from './fio/store'
+import { filterTradingsByExchangePairs } from './fio/util'
 
 export interface Acquisition {
   materialId: string
@@ -28,7 +29,7 @@ export const getBestAcquisitions = (
   weightCapacity: number,
   volumeCapacity: number,
 ): AcquisitionSummary => {
-  const tradings = dataStore.filterTradingsByExchangePairs(from, to)
+  const tradings = filterTradingsByExchangePairs(dataStore.orders, from, to)
   for (const trading of Object.values(tradings)) {
     trading.buyingOrders = trading.buyingOrders
       .toSorted((a, b) => a.ItemCost - b.ItemCost)
@@ -157,4 +158,16 @@ export const formatAcquisitionSummary = (
   result += `Total Weight: ${summary.totalWeight.toFixed(2)}T\n`
   result += `Total Volume: ${summary.totalVolume.toFixed(2)}m³\n`
   return result
+}
+
+export const findSupplyShortage = (dataStore: DataStore, filterEx: string) => {
+  const tradings = dataStore.orders.filter(o => {
+    return (
+      o.ExchangeCode === filterEx &&
+      o.SellingOrders.length === 0 &&
+      o.BuyingOrders.length > 0
+    )
+  })
+
+  return tradings.toSorted((a, b) => a.Bid - b.Bid).toReversed()
 }
