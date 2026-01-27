@@ -101,6 +101,16 @@ const GraphView: FC = () => {
 }
 
 const ProductionLineExplorerPageInner = () => {
+  const { isLoading } = useGameData()
+
+  if (isLoading) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center text-lg font-medium">
+        Loading Necessary Data...
+      </div>
+    )
+  }
+
   return (
     <div className="p-4 size-full flex flex-col">
       <Setting />
