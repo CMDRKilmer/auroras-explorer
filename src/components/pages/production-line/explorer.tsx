@@ -8,9 +8,10 @@ import {
   useNodesState,
   useReactFlow,
 } from '@xyflow/react'
-import { useGameData } from '@/lib/store'
+import { useDataLoadingState, useGameData } from '@/lib/store'
 import '@xyflow/react/dist/style.css'
 import { type FC, useCallback, useEffect } from 'react'
+import { formatSize } from '@/lib/format'
 import { useExplorerContext } from './context'
 import { ExplorerContextProvider } from './context-provider'
 import type { Graph } from './graph'
@@ -80,11 +81,15 @@ const GraphView: FC = () => {
 
 const ProductionLineExplorerPageInner = () => {
   const { isLoading } = useGameData()
+  const { progress, rate } = useDataLoadingState()
 
   if (isLoading) {
     return (
       <div className="absolute inset-0 flex items-center justify-center text-lg font-medium">
         Loading Necessary Data...
+        <div>
+          {progress.toFixed(2)}% @ {formatSize(rate)}/s
+        </div>
       </div>
     )
   }

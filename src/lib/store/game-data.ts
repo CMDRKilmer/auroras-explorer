@@ -1,4 +1,5 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import { createStore, useStore } from 'zustand'
 import * as fio from '@/lib/fio'
 import { getDataWithCache } from './fs'
 
@@ -12,34 +13,106 @@ export interface GameData {
   buildingsByTicker: Record<string, fio.Building>
 }
 
-const loadGameData = async (): Promise<GameData> => {
-  const [orders, materials, recipes, exchanges, buildings] = await Promise.all([
-    getDataWithCache(fio.getOrdersData, 'orders', {
-      expiryMs: 1000 * 60 * 5, // 5 minutes
-    }),
-    getDataWithCache(fio.getAllMaterials, 'materials'),
-    getDataWithCache(fio.getAllRecipes, 'recipes'),
-    getDataWithCache(fio.getAllExchanges, 'exchanges'),
-    getDataWithCache(fio.getAllBuildings, 'buildings'),
-  ])
+interface DataLoadingState {
+  progress: number
+  rate: number
+  setProgress: (progress: number) => void
+  setRate: (rate: number) => void
+}
 
+const dataLoadingStateStore = createStore<DataLoadingState>(set => ({
+  progress: 0,
+  rate: 0,
+  setProgress: (progress: number) => set({ progress }),
+  setRate: (rate: number) => set({ rate }),
+}))
+
+export const useDataLoadingState = () => useStore(dataLoadingStateStore)
+
+interface LoaderConfig<T = unknown> {
+  key: string
+  fn: (opt?: fio.LoadDataOptions) => Promise<T>
+  expiryMs?: number
+  apply: (g: GameData, data: T) => void
+}
+
+const loaders: LoaderConfig[] = []
+
+const addLoader = <T>(config: LoaderConfig<T>) => {
+  loaders.push(config as LoaderConfig)
+}
+
+addLoader({
+  key: 'orders',
+  fn: fio.getOrdersData,
+  expiryMs: 1000 * 60 * 5, // 5 minutes
+  apply: (g, data) => {
+    g.orders = data
+  },
+})
+
+addLoader({
+  key: 'materials',
+  fn: fio.getAllMaterials,
+  apply: (g, data) => {
+    g.materials = data.toSorted((a, b) => a.Ticker.localeCompare(b.Ticker))
+    g.materialsByTicker = {}
+    for (const material of data) {
+      g.materialsByTicker[material.Ticker] = material
+    }
+  },
+})
+
+addLoader({
+  key: 'recipes',
+  fn: fio.getAllRecipes,
+  apply: (g, data) => {
+    g.recipes = data
+  },
+})
+
+addLoader({
+  key: 'exchanges',
+  fn: fio.getAllExchanges,
+  apply: (g, data) => {
+    g.exchanges = data
+  },
+})
+
+addLoader({
+  key: 'buildings',
+  fn: fio.getAllBuildings,
+  apply: (g, data) => {
+    g.buildings = data.toSorted((a, b) => a.Ticker.localeCompare(b.Ticker))
+    g.buildingsByTicker = {}
+    for (const building of data) {
+      g.buildingsByTicker[building.Ticker] = building
+    }
+  },
+})
+
+const loadGameData = async (): Promise<GameData> => {
   const dataStore: GameData = {
-    materials: materials.toSorted((a, b) => a.Ticker.localeCompare(b.Ticker)),
+    materials: [],
     materialsByTicker: {},
-    orders,
-    recipes,
-    exchanges,
-    buildings: buildings.toSorted((a, b) => a.Ticker.localeCompare(b.Ticker)),
+    orders: [],
+    recipes: [],
+    exchanges: [],
+    buildings: [],
     buildingsByTicker: {},
   }
 
-  for (const material of materials) {
-    dataStore.materialsByTicker[material.Ticker] = material
-  }
-
-  for (const building of buildings) {
-    dataStore.buildingsByTicker[building.Ticker] = building
-  }
+  await Promise.all(
+    loaders.map(async ({ key, fn, apply, expiryMs }) => {
+      const opt: fio.LoadDataOptions = {
+        onProgress(event) {
+          console.log('progress', { key, event })
+        },
+      }
+      const data = await getDataWithCache(() => fn(opt), key, { expiryMs })
+      apply(dataStore, data)
+    }),
+  )
 
   return dataStore
 }

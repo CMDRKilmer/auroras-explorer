@@ -1,3 +1,4 @@
+import axios, { type AxiosProgressEvent } from 'axios'
 import type {
   Building,
   CommodityExchange,
@@ -9,38 +10,37 @@ import type {
 export * from './types'
 
 const fioBaseUrl = 'https://rest.fnar.net'
+const fioClient = axios.create({
+  baseURL: fioBaseUrl,
+  timeout: 30000,
+})
 
-export const getOrdersData = async () => {
-  // https://rest.fnar.net/exchange/full
-  const res = await fetch(`${fioBaseUrl}/exchange/full`)
-  const data = await res.json()
-  return data as TradingSummary[]
+export interface LoadDataOptions {
+  onProgress?: (progressEvent?: AxiosProgressEvent) => void
 }
 
-export const getAllMaterials = async () => {
-  // https://rest.fnar.net/material/allmaterials
-  const res = await fetch(`${fioBaseUrl}/material/allmaterials`)
-  const data = await res.json()
-  return data as Material[]
+const createDataLoader = <T>(uri: string) => {
+  return async (opt: LoadDataOptions = {}) => {
+    const res = await fioClient.get<T>(uri, {
+      onDownloadProgress: opt.onProgress,
+    })
+    return res.data
+  }
 }
 
-export const getAllRecipes = async () => {
-  // https://rest.fnar.net/recipes/allrecipes
-  const res = await fetch(`${fioBaseUrl}/recipes/allrecipes`)
-  const data = await res.json()
-  return data as Recipe[]
-}
+export const getOrdersData =
+  createDataLoader<TradingSummary[]>('/exchange/full')
 
-export const getAllExchanges = async () => {
-  // https://rest.fnar.net/global/comexexchanges
-  const res = await fetch(`${fioBaseUrl}/global/comexexchanges`)
-  const data = await res.json()
-  return data as CommodityExchange[]
-}
+export const getAllMaterials = createDataLoader<Material[]>(
+  '/material/allmaterials',
+)
 
-export const getAllBuildings = async () => {
-  // https://rest.fnar.net/building/allbuildings
-  const res = await fetch(`${fioBaseUrl}/building/allbuildings`)
-  const data = await res.json()
-  return data as Building[]
-}
+export const getAllRecipes = createDataLoader<Recipe[]>('/recipes/allrecipes')
+
+export const getAllExchanges = createDataLoader<CommodityExchange[]>(
+  '/global/comexexchanges',
+)
+
+export const getAllBuildings = createDataLoader<Building[]>(
+  '/building/allbuildings',
+)
