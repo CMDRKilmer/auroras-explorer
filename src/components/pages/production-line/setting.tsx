@@ -19,7 +19,7 @@ export const Setting: FC = () => {
 
   return (
     <div className="flex gap-4">
-      <Field className="max-w-60">
+      <Field className="w-60">
         <FieldLabel>Commodity Exchange</FieldLabel>
         <Select value={cx} onValueChange={value => setCx(value)}>
           <SelectTrigger className="w-full max-w-xs">
@@ -42,7 +42,7 @@ export const Setting: FC = () => {
         </Select>
       </Field>
 
-      <Field className="max-w-50">
+      <Field className="w-50">
         <FieldLabel>Material</FieldLabel>
         <MaterialSelector
           materials={data?.materials || []}
@@ -54,7 +54,7 @@ export const Setting: FC = () => {
         />
       </Field>
 
-      <Field className="max-w-60">
+      <Field className="w-60">
         <FieldLabel>Building</FieldLabel>
 
         <Select
