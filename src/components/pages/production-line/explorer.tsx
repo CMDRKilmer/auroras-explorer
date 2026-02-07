@@ -9,10 +9,10 @@ import {
   useNodesState,
   useReactFlow,
 } from '@xyflow/react'
-import { useDataLoadingState, useGameData } from '@/lib/store'
+import { useGameData } from '@/lib/store'
 import '@xyflow/react/dist/style.css'
 import { type FC, useCallback, useEffect } from 'react'
-import { formatSize } from '@/lib/format'
+import { GameDataLoadingWrapper } from '@/components/common/game-data-loading-wrapper'
 import { useExplorerContext } from './context'
 import { ExplorerContextProvider } from './context-provider'
 import { ExplorerControls } from './controls'
@@ -88,23 +88,6 @@ const GraphView: FC = () => {
 }
 
 const ProductionLineExplorerPageInner = () => {
-  const { isLoading } = useGameData()
-  const { progress, rate } = useDataLoadingState()
-
-  if (isLoading) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center text-lg font-medium">
-        Loading Necessary Data...
-        <div
-          className="hidden"
-          // TODO: show loading progress
-        >
-          {progress.toFixed(2)}% @ {formatSize(rate)}/s
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="p-4 size-full flex flex-col">
       <div className="mt-4 w-full flex-1 border border-border rounded">
@@ -116,10 +99,12 @@ const ProductionLineExplorerPageInner = () => {
 
 export const ProductionLineExplorerPage: FC = () => {
   return (
-    <ReactFlowProvider>
-      <ExplorerContextProvider>
-        <ProductionLineExplorerPageInner />
-      </ExplorerContextProvider>
-    </ReactFlowProvider>
+    <GameDataLoadingWrapper>
+      <ReactFlowProvider>
+        <ExplorerContextProvider>
+          <ProductionLineExplorerPageInner />
+        </ExplorerContextProvider>
+      </ReactFlowProvider>
+    </GameDataLoadingWrapper>
   )
 }

@@ -1,5 +1,6 @@
 import copy from 'copy-to-clipboard'
 import { useCallback, useState, useTransition } from 'react'
+import { GameDataLoadingWrapper } from '@/components/common/game-data-loading-wrapper'
 import { CommodityExchangeSelect } from '@/components/game/select/cx-select'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
@@ -155,8 +156,10 @@ const ShipmentPageInner = () => {
 
 export const ShipmentPage = () => {
   return (
-    <ShipmentContextProvider>
-      <ShipmentPageInner />
-    </ShipmentContextProvider>
+    <GameDataLoadingWrapper>
+      <ShipmentContextProvider>
+        <ShipmentPageInner />
+      </ShipmentContextProvider>
+    </GameDataLoadingWrapper>
   )
 }
