@@ -70,15 +70,21 @@ export function MaterialSelector({
       <PopoverContent align="start" className="p-0">
         <Command
           loop
-          filter={(value, search) => {
+          filter={(value, search, keywords) => {
             if (value === search) return 1
             if (value.toLowerCase() === search.toLowerCase()) return 0.95
             if (value.toLowerCase().startsWith(search.toLowerCase())) return 0.9
             if (value.toLowerCase().includes(search.toLowerCase())) return 0.7
+            if (
+              keywords?.some(keyword =>
+                keyword.toLowerCase().includes(search.toLowerCase()),
+              )
+            )
+              return 0.5
             return 0
           }}
         >
-          <CommandList className="h-(--cmdk-list-height) max-h-[400px]">
+          <CommandList className="h-(--cmdk-list-height) max-h-100">
             <CommandInput placeholder="Search Materials..." />
             <CommandEmpty>No Material found.</CommandEmpty>
             {groupedMaterials.map(category => (
@@ -120,6 +126,8 @@ const MaterialItem = React.forwardRef<HTMLDivElement, MaterialItemProps>(
         onSelect={onSelect}
         ref={ref}
         className="data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground"
+        value={material.Ticker}
+        keywords={[material.Ticker, material.Name]}
       >
         {material.Ticker} - {startCase(material.Name)}
         <Check

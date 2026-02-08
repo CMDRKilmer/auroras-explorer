@@ -1,4 +1,5 @@
-import { type FC, useMemo, useState } from 'react'
+import { getRouteApi, useRouter } from '@tanstack/react-router'
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { ExplorerContext } from './context'
 
 interface ExplorerHistoryItem {
@@ -6,18 +7,27 @@ interface ExplorerHistoryItem {
   building?: string
 }
 
+const routeApi = getRouteApi('/production-line/')
+
 export const ExplorerContextProvider: FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [cx, setCx] = useState<string | undefined>('NC1')
-  const [mat, setMat] = useState<string | undefined>('AU')
-  const [building, setBuilding] = useState<string | undefined>(undefined)
+  const params = routeApi.useSearch()
+  const navigate = routeApi.useNavigate()
+  const router = useRouter()
+
+  const mat = params.material
+  const building = params.building
+
   const [history, setHistory] = useState<ExplorerHistoryItem[]>(() => {
     return [{ mat, building }]
   })
+
   const [historyIndex, setHistoryIndex] = useState<number>(0)
-  const value = useMemo(() => {
-    const pushHistory = (item: ExplorerHistoryItem) => {
+
+  const pushHistory = useCallback(
+    (item: ExplorerHistoryItem) => {
       if (
         history[historyIndex].mat === item.mat &&
         history[historyIndex].building === item.building
@@ -26,22 +36,77 @@ export const ExplorerContextProvider: FC<{ children: React.ReactNode }> = ({
       }
       setHistory(prev => [...prev.slice(0, historyIndex + 1), item])
       setHistoryIndex(prev => prev + 1)
+    },
+    [history, historyIndex],
+  )
+
+  useEffect(() => {
+    if (params.material == null && params.building == null) {
+      navigate({
+        search: {
+          material: 'AU',
+          building: undefined,
+        },
+      })
+      setHistory([{ mat: 'AU', building: undefined }])
+      setHistoryIndex(0)
+      return
     }
+    const isBackNavigation =
+      history[historyIndex - 1] &&
+      history[historyIndex - 1].mat === params.material &&
+      history[historyIndex - 1].building === params.building
+    const isForwardNavigation =
+      history[historyIndex + 1] &&
+      history[historyIndex + 1].mat === params.material &&
+      history[historyIndex + 1].building === params.building
+    if (isBackNavigation) {
+      setHistoryIndex(prev => prev - 1)
+    } else if (isForwardNavigation) {
+      setHistoryIndex(prev => prev + 1)
+    } else {
+      pushHistory({
+        mat: params.material,
+        building: params.building,
+      })
+    }
+  }, [params, navigate, history, historyIndex, pushHistory])
+
+  const setMat = useCallback(
+    (mat: string | undefined) => {
+      navigate({
+        search: {
+          material: mat,
+          building: undefined,
+        },
+      })
+    },
+    [navigate],
+  )
+  const setBuilding = useCallback(
+    (building: string | undefined) => {
+      navigate({
+        search: {
+          material: undefined,
+          building: building,
+        },
+      })
+    },
+    [navigate],
+  )
+
+  const value = useMemo(() => {
     const canBack = historyIndex > 0
     const canForward = historyIndex < history.length - 1
     const back = () => {
       if (canBack) {
-        const item = history[historyIndex - 1]
-        setMat(item.mat)
-        setBuilding(item.building)
+        router.history.back()
         setHistoryIndex(prev => prev - 1)
       }
     }
     const forward = () => {
       if (canForward) {
-        const item = history[historyIndex + 1]
-        setMat(item.mat)
-        setBuilding(item.building)
+        router.history.forward()
         setHistoryIndex(prev => prev + 1)
       }
     }
@@ -49,23 +114,24 @@ export const ExplorerContextProvider: FC<{ children: React.ReactNode }> = ({
       cx,
       setCx,
       mat,
-      setMat: (mat: string | undefined) => {
-        pushHistory({ mat: mat, building: undefined })
-        setMat(mat)
-        setBuilding(undefined)
-      },
+      setMat,
       building,
-      setBuilding: (building: string | undefined) => {
-        pushHistory({ mat: undefined, building: building })
-        setMat(undefined)
-        setBuilding(building)
-      },
+      setBuilding,
       canBack,
       canForward,
       back,
       forward,
     }
-  }, [cx, mat, building, history, historyIndex])
+  }, [
+    historyIndex,
+    history.length,
+    cx,
+    mat,
+    setMat,
+    building,
+    setBuilding,
+    router.history,
+  ])
 
   return (
     <ExplorerContext.Provider value={value}>
