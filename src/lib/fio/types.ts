@@ -237,3 +237,115 @@ export interface Building {
   UserNameSubmitted: string
   Timestamp: string
 }
+
+// "Dependencies": [],
+// "Address": null,
+// "MaterialId": null,
+// "MaterialTicker": null,
+// "MaterialAmount": null,
+// "Weight": 0,
+// "Volume": 0,
+// "BlockId": null,
+// "Type": "PAYMENT",
+// "ConditionId": "17f4c0415594c6ddadbf2ab0ca3efc41",
+// "Party": "PROVIDER",
+// "ConditionIndex": 0,
+// "Status": "PENDING",
+// "DeadlineDurationMs": null,
+// "DeadlineEpochMs": null,
+// "Amount": 1,
+// "Currency": "ICA",
+// "Destination": null,
+// "ShipmentItemId": null,
+// "PickedUpMaterialId": null,
+// "PickedUpMaterialTicker": null,
+// "PickedUpAmount": null,
+// "InterestAmount": null,
+// "InterestCurrency": null,
+// "RepaymentAmount": null,
+// "RepaymentCurrency": null,
+// "TotalAmount": null,
+// "TotalCurrency": null
+export interface UserContractCondition {
+  Dependencies: {
+    Dependency: string
+  }[]
+  Address: string | null
+  MaterialId: string | null
+  MaterialTicker: string | null
+  MaterialAmount: number | null
+  Weight: number
+  Volume: number
+  BlockId: string | null
+  Type: string
+  ConditionId: string
+  Party: string
+  ConditionIndex: number
+  Status: string
+  DeadlineDurationMs: number | null
+  DeadlineEpochMs: number | null
+  Amount: number
+  Currency: string
+  Destination: string | null
+  ShipmentItemId: string | null
+  PickedUpMaterialId: string | null
+  PickedUpMaterialTicker: string | null
+  PickedUpAmount: number | null
+  InterestAmount: number | null
+  InterestCurrency: string | null
+  RepaymentAmount: number | null
+  RepaymentCurrency: string | null
+  TotalAmount: number | null
+  TotalCurrency: string | null
+}
+
+// "Conditions": [],
+// "ContractId": "33c909ae4ba8f9bc663d8ca5dae4a0df",
+// "ContractLocalId": "0XD2RH9",
+// "DateEpochMs": 1770903024981,
+// "ExtensionDeadlineEpochMs": null,
+// "DueDateEpochMs": null,
+// "CanExtend": false,
+// "CanRequestTermination": true,
+// "TerminationSent": false,
+// "TerminationReceived": false,
+// "Name": "SNGP-OF375c-4d",
+// "Preamble": "",
+// "Party": "PROVIDER",
+// "Status": "OPEN",
+// "PartnerId": "6a246f61d0315e1f90f9c89d35f9d508",
+// "PartnerName": "RestAurantCn",
+// "PartnerCompanyCode": "RACN",
+// "UserNameSubmitted": "IVY_EXE",
+// "Timestamp": "2026-02-12T13:30:25.532137Z"
+
+export interface UserContract {
+  Conditions: UserContractCondition[]
+  ContractId: string
+  ContractLocalId: string
+  DateEpochMs: number
+  ExtensionDeadlineEpochMs: number | null
+  DueDateEpochMs: number | null
+  CanExtend: boolean
+  CanRequestTermination: boolean
+  TerminationSent: boolean
+  TerminationReceived: boolean
+  Name: string
+  Preamble: string
+  Party: string
+  Status: string
+  PartnerId: string
+  PartnerName: string
+  PartnerCompanyCode: string
+  UserNameSubmitted: string
+  Timestamp: string
+}
+
+export interface Group {
+  GroupAdmins: {
+    GroupAdminUserName: string
+  }[]
+  GroupUsers: {
+    GroupUserName: string
+  }[]
+}

@@ -2,6 +2,8 @@ import axios, { type AxiosProgressEvent } from 'axios'
 import type {
   Building,
   CommodityExchange,
+  Contract,
+  Group,
   Material,
   Recipe,
   TradingSummary,
@@ -44,3 +46,36 @@ export const getAllExchanges = createDataLoader<CommodityExchange[]>(
 export const getAllBuildings = createDataLoader<Building[]>(
   '/building/allbuildings',
 )
+
+export const getUserContracts = async (username: string, token: string) => {
+  const res = await fioClient.get<Contract[]>(
+    `/contract/allcontracts/${username}`,
+    {
+      headers: {
+        Authorization: token,
+      },
+    },
+  )
+
+  return res.data
+}
+
+export const getGroups = async (token: string) => {
+  const res = await fioClient.get<string[]>(`/auth/groups`, {
+    headers: {
+      Authorization: token,
+    },
+  })
+
+  return res.data
+}
+
+export const getGroup = async (id: string, token: string) => {
+  const res = await fioClient.get<Group>(`/auth/group/${id}`, {
+    headers: {
+      Authorization: token,
+    },
+  })
+
+  return res.data
+}
