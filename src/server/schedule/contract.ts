@@ -23,7 +23,9 @@ export class SaveUserContractTask {
   }
 
   async run() {
+    if (this.running) return
     this.running = true
+    await this.init()
     while (this.running) {
       const now = Date.now()
       if (
