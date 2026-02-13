@@ -1,7 +1,10 @@
+import axios from 'axios'
+import { maxBy } from 'es-toolkit'
 import { getGroup, getUserContracts } from '@/lib/fio'
 import { sleep } from '@/lib/sleep'
 import { config } from '../common/config'
 import { bulkSaveUserContracts } from '../store/contract'
+import { updateSyncStatus } from '../store/status'
 
 export class SaveUserContractTask {
   usernames: string[] = []
@@ -40,14 +43,33 @@ export class SaveUserContractTask {
   }
 
   async saveUserContracts(username: string) {
-    const contracts = await getUserContracts(username, this.token)
-    await bulkSaveUserContracts(contracts)
+    try {
+      const contracts = await getUserContracts(username, this.token)
+      await bulkSaveUserContracts(contracts)
+      const syncStatus = {
+        username,
+        lastContSubmitAt: maxBy(contracts, c => new Date(c.Timestamp).valueOf())
+          ?.Timestamp,
+        lastContSyncAt: new Date(),
+        lastContSyncStatus: 'SUCCESS',
+      }
+
+      await updateSyncStatus(syncStatus)
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        await updateSyncStatus({
+          username,
+          lastContSyncAt: new Date(),
+          lastContSyncStatus: 'NO_PERMISSION',
+        })
+      }
+    }
   }
 
   async executeSaveUserContractTask() {
     for (const username of this.usernames) {
       try {
-        console.log(new Date().toISOString())
+        console.log(new Date().toLocaleString())
         console.log('Saving contracts for user', username)
         await this.saveUserContracts(username)
         console.log('Saved contracts for user', username)

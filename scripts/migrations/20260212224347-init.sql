@@ -104,3 +104,14 @@ CREATE INDEX IF NOT EXISTS "idx_fio_user_contract_conditions_Type" ON "fio_user_
 CREATE INDEX IF NOT EXISTS "idx_fio_user_contract_conditions_Party" ON "fio_user_contract_conditions" ("Party");
 CREATE INDEX IF NOT EXISTS "idx_fio_user_contract_conditions_Status" ON "fio_user_contract_conditions" ("Status");
 CREATE INDEX IF NOT EXISTS "idx_fio_user_contract_conditions_MaterialTicker" ON "fio_user_contract_conditions" ("MaterialTicker");
+
+CREATE TABLE IF NOT EXISTS "sync_task_status"
+(
+  username TEXT NOT NULL,
+  last_cont_submit_at TIMESTAMP,
+  last_cont_sync_at TIMESTAMP,
+  last_cont_sync_status TEXT ,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (username)
+);

@@ -1,5 +1,5 @@
-import { config } from './common/config'
-import { SaveUserContractTask } from './schedule/contract'
+import { config } from '../common/config'
+import { SaveUserContractTask } from './contract'
 
 export const main = async () => {
   const task = new SaveUserContractTask(config.fio.groupId, config.fio.apiToken)

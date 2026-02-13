@@ -1,7 +1,13 @@
-import dayjs from 'dayjs'
+import Dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
 import localizedFormat from 'dayjs/plugin/localizedFormat'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
-dayjs.extend(localizedFormat)
+Dayjs.extend(localizedFormat)
+Dayjs.extend(relativeTime)
+Dayjs.extend(duration)
+
+export const dayjs = Dayjs
 
 export const formatDuration = (ms: number): string => {
   const seconds = Math.floor(ms / 1000)
@@ -21,8 +27,16 @@ export const formatDuration = (ms: number): string => {
   return `${seconds}s`
 }
 
-export const formatTime = (date: dayjs.ConfigType): string => {
+export const formatTime = (date: Dayjs.ConfigType): string => {
   return dayjs(date).format('LLL')
+}
+
+export const formatTimeAdvanced = (date: Dayjs.ConfigType): string => {
+  const time = dayjs(date)
+  if (time.isBefore(dayjs().subtract(5, 'day'))) {
+    return time.format('LL')
+  }
+  return dayjs(date).fromNow()
 }
 
 export const formatSize = (bytes: number): string => {

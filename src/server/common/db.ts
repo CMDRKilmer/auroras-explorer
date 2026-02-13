@@ -1,7 +1,7 @@
 import Knex from 'knex'
 import { config } from './config'
 
-export const knex = Knex({
+export const db = Knex({
   client: 'pg',
   connection: config.db,
 })

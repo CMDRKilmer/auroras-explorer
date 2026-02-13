@@ -1,7 +1,7 @@
 import { chunk } from 'es-toolkit'
 import type { UserContract } from '@/lib/fio'
 import { parseOrderBy } from '@/lib/order'
-import { knex } from '../common/db'
+import { db } from '../common/db'
 
 export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,7 +25,7 @@ export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
     },
   )
   for (const chunkedContracts of chunk(contractsToSave, 50)) {
-    await knex('fio_user_contracts')
+    await db('fio_user_contracts')
       .insert(chunkedContracts)
       .onConflict(['ContractId', 'UserNameSubmitted'])
       .merge()
@@ -34,7 +34,7 @@ export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
   }
 
   for (const chunkedConditions of chunk(conditionsToSave, 50)) {
-    await knex('fio_user_contract_conditions')
+    await db('fio_user_contract_conditions')
       .insert(chunkedConditions)
       .onConflict(['ConditionId', 'UserNameSubmitted'])
       .merge()
@@ -43,7 +43,7 @@ export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
   }
 }
 
-interface ListContractsOptions {
+export interface ListContractsOptions {
   usernames: string[]
   limit?: number
   offset?: number
@@ -59,10 +59,10 @@ const getConditionsForContract = async (
 
   const placeholders = keys.map(() => '(?, ?)').join(', ')
 
-  const conditions = await knex('fio_user_contract_conditions AS c')
+  const conditions = await db('fio_user_contract_conditions AS c')
     .select('c.*')
     .innerJoin(
-      knex.raw(`(VALUES ${placeholders}) AS k (cid, u)`, bindings),
+      db.raw(`(VALUES ${placeholders}) AS k (cid, u)`, bindings),
       function () {
         this.on('c.ContractId', '=', 'k.cid').andOn(
           'c.UserNameSubmitted',
@@ -81,7 +81,7 @@ export const listContracts = async ({
   offset = 0,
   order = '-DateEpochMs',
 }: ListContractsOptions) => {
-  const query = knex('fio_user_contracts').select('*')
+  const query = db('fio_user_contracts').select('*')
 
   if (usernames.length > 0) {
     query.whereIn('UserNameSubmitted', usernames)
@@ -98,15 +98,31 @@ export const listContracts = async ({
 
   const conditions = await getConditionsForContract(contracts)
 
-  for (const contract of contracts) {
-    contract.Conditions = conditions
-      .filter(
-        c =>
-          c.ContractId === contract.ContractId &&
-          c.UserNameSubmitted === contract.UserNameSubmitted,
-      )
-      .toSorted((a, b) => a.ConditionIndex - b.ConditionIndex)
-  }
-
-  return contracts
+  return contracts.map(contract => {
+    return {
+      ...contract,
+      DateEpochMs: Number(contract.DateEpochMs),
+      DueDateEpochMs: contract.DueDateEpochMs
+        ? Number(contract.DueDateEpochMs)
+        : null,
+      Conditions: conditions
+        .filter(
+          c =>
+            c.ContractId === contract.ContractId &&
+            c.UserNameSubmitted === contract.UserNameSubmitted,
+        )
+        .map(c => {
+          return {
+            ...c,
+            DeadlineDurationMs: c.DeadlineDurationMs
+              ? Number(c.DeadlineDurationMs)
+              : null,
+            DeadlineEpochMs: c.DeadlineEpochMs
+              ? Number(c.DeadlineEpochMs)
+              : null,
+          }
+        })
+        .toSorted((a, b) => a.ConditionIndex - b.ConditionIndex),
+    }
+  })
 }

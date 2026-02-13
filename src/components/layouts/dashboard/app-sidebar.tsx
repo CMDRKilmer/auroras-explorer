@@ -1,6 +1,5 @@
 import { IconInnerShadowTop } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
-import { tools } from '@/components/pages/gallery/tools'
 import {
   Sidebar,
   SidebarContent,
@@ -10,17 +9,15 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { useNavigates } from '@/hooks/use-navigates'
 import { useLocalStorage } from '@/hooks/use-storage'
 import { formatTime } from '@/lib/format'
 import TablerBrandDiscord from '~icons/tabler/brand-discord'
 import { NavMain } from './nav-main'
 
-const data = {
-  navMain: tools,
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dataUpdatedAt = useLocalStorage<number>('ct-orders')
+  const navigates = useNavigates()
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -42,9 +39,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        <NavMain items={navigates} />
       </SidebarContent>
       <SidebarFooter>
         <div className="text-muted-foreground flex flex-col text-xs gap-4">

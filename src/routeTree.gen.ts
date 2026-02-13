@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShipmentIndexRouteImport } from './routes/shipment/index'
 import { Route as ProductionLineIndexRouteImport } from './routes/production-line/index'
+import { Route as GroupChar123GroupIdChar125ContractsIndexRouteImport } from './routes/group/{-$groupId}/contracts/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,54 @@ const ProductionLineIndexRoute = ProductionLineIndexRouteImport.update({
   path: '/production-line/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GroupChar123GroupIdChar125ContractsIndexRoute =
+  GroupChar123GroupIdChar125ContractsIndexRouteImport.update({
+    id: '/group/{-$groupId}/contracts/',
+    path: '/group/{-$groupId}/contracts/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/production-line/': typeof ProductionLineIndexRoute
   '/shipment/': typeof ShipmentIndexRoute
+  '/group/{-$groupId}/contracts/': typeof GroupChar123GroupIdChar125ContractsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/production-line': typeof ProductionLineIndexRoute
   '/shipment': typeof ShipmentIndexRoute
+  '/group/{-$groupId}/contracts': typeof GroupChar123GroupIdChar125ContractsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/production-line/': typeof ProductionLineIndexRoute
   '/shipment/': typeof ShipmentIndexRoute
+  '/group/{-$groupId}/contracts/': typeof GroupChar123GroupIdChar125ContractsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/production-line/' | '/shipment/'
+  fullPaths:
+    | '/'
+    | '/production-line/'
+    | '/shipment/'
+    | '/group/{-$groupId}/contracts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/production-line' | '/shipment'
-  id: '__root__' | '/' | '/production-line/' | '/shipment/'
+  to: '/' | '/production-line' | '/shipment' | '/group/{-$groupId}/contracts'
+  id:
+    | '__root__'
+    | '/'
+    | '/production-line/'
+    | '/shipment/'
+    | '/group/{-$groupId}/contracts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProductionLineIndexRoute: typeof ProductionLineIndexRoute
   ShipmentIndexRoute: typeof ShipmentIndexRoute
+  GroupChar123GroupIdChar125ContractsIndexRoute: typeof GroupChar123GroupIdChar125ContractsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductionLineIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/group/{-$groupId}/contracts/': {
+      id: '/group/{-$groupId}/contracts/'
+      path: '/group/{-$groupId}/contracts'
+      fullPath: '/group/{-$groupId}/contracts/'
+      preLoaderRoute: typeof GroupChar123GroupIdChar125ContractsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +116,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProductionLineIndexRoute: ProductionLineIndexRoute,
   ShipmentIndexRoute: ShipmentIndexRoute,
+  GroupChar123GroupIdChar125ContractsIndexRoute:
+    GroupChar123GroupIdChar125ContractsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
