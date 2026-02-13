@@ -3,6 +3,7 @@ import { SaveUserContractTask } from './schedule/contract'
 
 export const main = async () => {
   const task = new SaveUserContractTask(config.fio.groupId, config.fio.apiToken)
+
   await task.run()
 }
 

@@ -30,6 +30,7 @@ CREATE INDEX IF NOT EXISTS "idx_fio_user_contracts_PartnerId" ON "fio_user_contr
 CREATE INDEX IF NOT EXISTS "idx_fio_user_contracts_Status" ON "fio_user_contracts" ("Status");
 CREATE INDEX IF NOT EXISTS "idx_fio_user_contracts_Party" ON "fio_user_contracts" ("Party");
 CREATE INDEX IF NOT EXISTS "idx_fio_user_contracts_UserNameSubmitted" ON "fio_user_contracts" ("UserNameSubmitted");
+CREATE INDEX IF NOT EXISTS "idx_fio_user_contracts_DateEpochMs" ON "fio_user_contracts" ("DateEpochMs");
 
 -- export interface ContractCondition {
 --   Dependencies: string[]
