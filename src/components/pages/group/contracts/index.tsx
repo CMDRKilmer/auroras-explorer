@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ContractList } from '@/components/game/contract/contract-list'
-import { userContractsQuery } from '@/lib/query/contract'
+import { groupContractsQuery } from '@/lib/query/contract'
 
 export const GroupContractsPage = () => {
   const {
@@ -8,9 +8,10 @@ export const GroupContractsPage = () => {
     isLoading,
     error,
   } = useQuery(
-    userContractsQuery({
-      usernames: ['IVY_EXE'],
+    groupContractsQuery({
+      groupId: '873386',
       order: '-DateEpochMs',
+      types: ['TRADING', 'SHIPMENT'],
     }),
   )
 

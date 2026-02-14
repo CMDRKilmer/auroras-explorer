@@ -1,18 +1,20 @@
 import axios, { type AxiosProgressEvent } from 'axios'
+import { memoize } from 'es-toolkit'
 import type {
   Building,
   CommodityExchange,
-  Contract,
+  Company,
   Group,
   Material,
   Recipe,
   TradingSummary,
+  UserContract,
 } from './types'
 
 export * from './types'
 
 const fioBaseUrl = 'https://rest.fnar.net'
-const fioClient = axios.create({
+export const fioClient = axios.create({
   baseURL: fioBaseUrl,
   timeout: 30000,
 })
@@ -48,7 +50,7 @@ export const getAllBuildings = createDataLoader<Building[]>(
 )
 
 export const getUserContracts = async (username: string, token: string) => {
-  const res = await fioClient.get<Contract[]>(
+  const res = await fioClient.get<UserContract[]>(
     `/contract/allcontracts/${username}`,
     {
       headers: {
@@ -76,6 +78,12 @@ export const getGroup = async (id: string, token: string) => {
       Authorization: token,
     },
   })
+
+  return res.data
+}
+
+export const getCompanyByCode = async (code: string) => {
+  const res = await fioClient.get<Company>(`/company/code/${code}`)
 
   return res.data
 }

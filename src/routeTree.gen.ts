@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShipmentIndexRouteImport } from './routes/shipment/index'
 import { Route as ProductionLineIndexRouteImport } from './routes/production-line/index'
+import { Route as GroupChar123GroupIdChar125MembersIndexRouteImport } from './routes/group/{-$groupId}/members/index'
 import { Route as GroupChar123GroupIdChar125ContractsIndexRouteImport } from './routes/group/{-$groupId}/contracts/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,12 @@ const ProductionLineIndexRoute = ProductionLineIndexRouteImport.update({
   path: '/production-line/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GroupChar123GroupIdChar125MembersIndexRoute =
+  GroupChar123GroupIdChar125MembersIndexRouteImport.update({
+    id: '/group/{-$groupId}/members/',
+    path: '/group/{-$groupId}/members/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GroupChar123GroupIdChar125ContractsIndexRoute =
   GroupChar123GroupIdChar125ContractsIndexRouteImport.update({
     id: '/group/{-$groupId}/contracts/',
@@ -41,12 +48,14 @@ export interface FileRoutesByFullPath {
   '/production-line/': typeof ProductionLineIndexRoute
   '/shipment/': typeof ShipmentIndexRoute
   '/group/{-$groupId}/contracts/': typeof GroupChar123GroupIdChar125ContractsIndexRoute
+  '/group/{-$groupId}/members/': typeof GroupChar123GroupIdChar125MembersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/production-line': typeof ProductionLineIndexRoute
   '/shipment': typeof ShipmentIndexRoute
   '/group/{-$groupId}/contracts': typeof GroupChar123GroupIdChar125ContractsIndexRoute
+  '/group/{-$groupId}/members': typeof GroupChar123GroupIdChar125MembersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -54,6 +63,7 @@ export interface FileRoutesById {
   '/production-line/': typeof ProductionLineIndexRoute
   '/shipment/': typeof ShipmentIndexRoute
   '/group/{-$groupId}/contracts/': typeof GroupChar123GroupIdChar125ContractsIndexRoute
+  '/group/{-$groupId}/members/': typeof GroupChar123GroupIdChar125MembersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -62,14 +72,21 @@ export interface FileRouteTypes {
     | '/production-line/'
     | '/shipment/'
     | '/group/{-$groupId}/contracts/'
+    | '/group/{-$groupId}/members/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/production-line' | '/shipment' | '/group/{-$groupId}/contracts'
+  to:
+    | '/'
+    | '/production-line'
+    | '/shipment'
+    | '/group/{-$groupId}/contracts'
+    | '/group/{-$groupId}/members'
   id:
     | '__root__'
     | '/'
     | '/production-line/'
     | '/shipment/'
     | '/group/{-$groupId}/contracts/'
+    | '/group/{-$groupId}/members/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +94,7 @@ export interface RootRouteChildren {
   ProductionLineIndexRoute: typeof ProductionLineIndexRoute
   ShipmentIndexRoute: typeof ShipmentIndexRoute
   GroupChar123GroupIdChar125ContractsIndexRoute: typeof GroupChar123GroupIdChar125ContractsIndexRoute
+  GroupChar123GroupIdChar125MembersIndexRoute: typeof GroupChar123GroupIdChar125MembersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -102,6 +120,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductionLineIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/group/{-$groupId}/members/': {
+      id: '/group/{-$groupId}/members/'
+      path: '/group/{-$groupId}/members'
+      fullPath: '/group/{-$groupId}/members/'
+      preLoaderRoute: typeof GroupChar123GroupIdChar125MembersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/group/{-$groupId}/contracts/': {
       id: '/group/{-$groupId}/contracts/'
       path: '/group/{-$groupId}/contracts'
@@ -118,6 +143,8 @@ const rootRouteChildren: RootRouteChildren = {
   ShipmentIndexRoute: ShipmentIndexRoute,
   GroupChar123GroupIdChar125ContractsIndexRoute:
     GroupChar123GroupIdChar125ContractsIndexRoute,
+  GroupChar123GroupIdChar125MembersIndexRoute:
+    GroupChar123GroupIdChar125MembersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,7 @@
 import ProductionLinePreviewImg from '@/assets/images/production-line-preview.webp'
 import ShipmentPreviewImg from '@/assets/images/shipment-preview.webp'
 import HugeiconsCargoShip from '~icons/hugeicons/cargo-ship'
+import MdiAccountGroupOutline from '~icons/mdi/account-group-outline'
 import MdiCompassOutline from '~icons/mdi/compass-outline'
 import MdiInvoiceListOutline from '~icons/mdi/invoice-list-outline'
 
@@ -22,6 +23,12 @@ export const useNavigates = () => {
       preview: ProductionLinePreviewImg,
       description: 'Visualization of production lines and their dependencies.',
       category: 'Explorer Tools',
+    },
+    {
+      title: 'Group Members',
+      url: '/group/members/',
+      icon: MdiAccountGroupOutline,
+      category: 'Group Tools',
     },
     {
       title: 'Group Contracts',

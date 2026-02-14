@@ -1,0 +1,85 @@
+
+CREATE TABLE "public"."user_groups" (
+  "group_id" TEXT NOT NULL,
+  "username" TEXT NOT NULL,
+  "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("group_id", "username")
+);
+
+
+
+  -- "UserDataId": "95578468740dd48cbb9b95ef4d35fa7a",
+  -- "UserId": "ab4a7a0a979be444f08d3170d882f3c8",
+  -- "UserName": "MirAi1201",
+  -- "SubscriptionLevel": "PRO",
+  -- "Tier": null,
+  -- "Team": false,
+  -- "Pioneer": false,
+  -- "Moderator": false,
+  -- "CreatedEpochMs": 1766397971119,
+  -- "CompanyId": "95578468740dd48cbb9b95ef4d35fa7a",
+  -- "CompanyName": "三河农业股份有限公司",
+  -- "CompanyCode": "SNG",
+  -- "CountryId": "4a2fe1ae3e1ca07dcfebbdf25c4b8d6a",
+  -- "CountryCode": "IC",
+  -- "CountryName": "Insitor Cooperative",
+  -- "CorporationId": "b734dc29908b8b24b58e0d73306f631b",
+  -- "CorporationName": "Cosmocene Combine",
+  -- "CorporationCode": "COSM",
+  -- "OverallRating": "A",
+  -- "ActivityRating": null,
+  -- "ReliabilityRating": null,
+  -- "StabilityRating": null,
+  -- "HeadquartersNaturalId": null,
+  -- "HeadquartersLevel": -1,
+  -- "HeadquartersBasePermits": -1,
+  -- "HeadquartersUsedBasePermits": -1,
+  -- "AdditionalBasePermits": -1,
+  -- "AdditionalProductionQueueSlots": -1,
+  -- "RelocationLocked": false,
+  -- "NextRelocationTimeEpochMs": 0,
+  -- "UserNameSubmitted": "YULUN",
+  -- "Timestamp": "2026-02-14T12:38:13.703126Z"
+
+CREATE TABLE "public"."fio_user_companies" (
+  "UserDataId" TEXT PRIMARY KEY,
+  "UserId" TEXT NOT NULL,
+  "UserName" TEXT NOT NULL,
+  "UsernameUpper" TEXT NOT NULL,
+  "SubscriptionLevel" TEXT NOT NULL,
+  "Tier" TEXT,
+  "Team" BOOLEAN NOT NULL,
+  "Pioneer" BOOLEAN NOT NULL,
+  "Moderator" BOOLEAN NOT NULL,
+  "CreatedEpochMs" BIGINT NOT NULL,
+  "CompanyId" TEXT NOT NULL,
+  "CompanyName" TEXT NOT NULL,
+  "CompanyCode" TEXT NOT NULL,
+  "CountryId" TEXT NOT NULL,
+  "CountryCode" TEXT NOT NULL,
+  "CountryName" TEXT NOT NULL,
+  "CorporationId" TEXT,
+  "CorporationName" TEXT,
+  "CorporationCode" TEXT,
+  "OverallRating" TEXT NOT NULL,
+  "ActivityRating" TEXT,
+  "ReliabilityRating" TEXT,
+  "StabilityRating" TEXT,
+  "HeadquartersNaturalId" TEXT,
+  "HeadquartersLevel" INTEGER NOT NULL,
+  "HeadquartersBasePermits" INTEGER NOT NULL,
+  "HeadquartersUsedBasePermits" INTEGER NOT NULL,
+  "AdditionalBasePermits" INTEGER NOT NULL,
+  "AdditionalProductionQueueSlots" INTEGER NOT NULL,
+  "RelocationLocked" BOOLEAN NOT NULL,
+  "NextRelocationTimeEpochMs" BIGINT NOT NULL,
+  "UserNameSubmitted" TEXT NOT NULL,
+  "Timestamp" TIMESTAMP NOT NULL,
+  "CreatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  "UpdatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS "idx_fio_user_companies_user_id" ON "public"."fio_user_companies" ("UserId");
+CREATE INDEX IF NOT EXISTS "idx_fio_user_companies_username" ON "public"."fio_user_companies" ("UserName");
+CREATE INDEX IF NOT EXISTS "idx_fio_user_companies_company_code" ON "public"."fio_user_companies" ("CompanyCode");

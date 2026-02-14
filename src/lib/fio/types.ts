@@ -349,3 +349,104 @@ export interface Group {
     GroupUserName: string
   }[]
 }
+
+// {
+//   "Balances": null,
+//   "Planets": [
+//     {
+//       "PlanetId": "cb158c1405b3b25c7490eb874fef777a",
+//       "PlanetNaturalId": "VH-331b",
+//       "PlanetName": "VH-331b"
+//     },
+//   ],
+//   "Offices": [
+//     {
+//       "PlanetNaturalId": "IA-158d",
+//       "PlanetName": "IA-158d",
+//       "StartEpochMs": 1764977250642,
+//       "EndEpochMs": 1767396450642
+//     }
+//   ],
+//   "UserDataId": "9696def7589d878d58dd15ed43091de3",
+//   "UserId": "f0370f4ab8abdc24dbe37ad04fde5c5c",
+//   "UserName": "YuLun",
+//   "SubscriptionLevel": "PRO",
+//   "Tier": "GALAXY",
+//   "Team": false,
+//   "Pioneer": false,
+//   "Moderator": false,
+//   "CreatedEpochMs": 1651976575303,
+//   "CompanyId": "9696def7589d878d58dd15ed43091de3",
+//   "CompanyName": "YuLun Group",
+//   "CompanyCode": "YLG",
+//   "CountryId": "4a2fe1ae3e1ca07dcfebbdf25c4b8d6a",
+//   "CountryCode": "IC",
+//   "CountryName": "Insitor Cooperative",
+//   "CorporationId": "737ec7bb539a636c6b16a05d09624f80",
+//   "CorporationName": "華龍集团 - Hua Loong Group",
+//   "CorporationCode": "HLG",
+//   "OverallRating": "A",
+//   "ActivityRating": null,
+//   "ReliabilityRating": null,
+//   "StabilityRating": null,
+//   "HeadquartersNaturalId": null,
+//   "HeadquartersLevel": -1,
+//   "HeadquartersBasePermits": -1,
+//   "HeadquartersUsedBasePermits": -1,
+//   "AdditionalBasePermits": -1,
+//   "AdditionalProductionQueueSlots": -1,
+//   "RelocationLocked": false,
+//   "NextRelocationTimeEpochMs": 0,
+//   "UserNameSubmitted": "IVY_EXE",
+//   "Timestamp": "2026-02-14T13:22:21.007925Z"
+// }
+
+export interface Planet {
+  PlanetId: string
+  PlanetNaturalId: string
+  PlanetName: string
+}
+
+export interface Office {
+  PlanetNaturalId: string
+  PlanetName: string
+  StartEpochMs: number
+  EndEpochMs: number
+}
+
+export interface Company {
+  Planets: Planet[]
+  Offices: Office[]
+  UserDataId: string
+  UserId: string
+  UserName: string
+  SubscriptionLevel: string
+  Tier: string | null
+  Team: boolean
+  Pioneer: boolean
+  Moderator: boolean
+  CreatedEpochMs: number
+  CompanyId: string
+  CompanyName: string
+  CompanyCode: string
+  CountryId: string
+  CountryCode: string
+  CountryName: string
+  CorporationId: string
+  CorporationName: string
+  CorporationCode: string
+  OverallRating: string
+  ActivityRating: string | null
+  ReliabilityRating: string | null
+  StabilityRating: string | null
+  HeadquartersNaturalId: string | null
+  HeadquartersLevel: number
+  HeadquartersBasePermits: number
+  HeadquartersUsedBasePermits: number
+  AdditionalBasePermits: number
+  AdditionalProductionQueueSlots: number
+  RelocationLocked: boolean
+  NextRelocationTimeEpochMs: number
+  UserNameSubmitted: string
+  Timestamp: string
+}
