@@ -1,12 +1,16 @@
 import { Hono } from 'hono'
+import { compress } from 'hono/compress'
 import { cors } from 'hono/cors'
 import { config } from '../common/config'
+import { httpLogger } from '../middlewares/logger'
 import { type ListContractsOptions, listContracts } from '../store/contract'
 import { getGroupUserInfos, getGroupUsernames } from '../store/group'
 
 const app = new Hono()
 
-app.use('/*', cors())
+app.use(cors())
+app.use(compress())
+app.use(httpLogger())
 
 // app.get('/api/user/:username/contracts', async c => {
 //   const contracts = await listUserContracts({

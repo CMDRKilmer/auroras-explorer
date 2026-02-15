@@ -11,17 +11,4 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "sqltools.connections": [
-    {
-      "ssh": "Disabled",
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 5432,
-      "driver": "PostgreSQL",
-      "name": "prun local",
-      "database": "prun",
-      "username": "postgres",
-      "password": "password"
-    }
-  ]
 }
