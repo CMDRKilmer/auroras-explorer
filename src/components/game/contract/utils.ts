@@ -1,6 +1,11 @@
-export const getContractStatusLabel = (status: string) => {
-  if (status === 'PARTIALLY_FULFILLED') {
-    return 'partial'
+import type { Contract } from '@/lib/api'
+
+export const getContractStatusLabel = (contract: Contract) => {
+  if (contract.Status === 'PARTIALLY_FULFILLED') {
+    const fulfilledCount = contract.Conditions.filter(
+      c => c.Status === 'FULFILLED',
+    ).length
+    return `partial (${fulfilledCount}/${contract.Conditions.length})`
   }
-  return status.toLowerCase().replaceAll('_', ' ')
+  return contract.Status.toLowerCase().replaceAll('_', ' ')
 }

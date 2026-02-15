@@ -1,5 +1,9 @@
-import { flexRender, type Table as TanStackTable } from '@tanstack/react-table'
-import type { FC } from 'react'
+import {
+  flexRender,
+  type Row,
+  type Table as TanStackTable,
+} from '@tanstack/react-table'
+import type { ComponentType, MouseEvent } from 'react'
 import {
   Table,
   TableBody,
@@ -9,17 +13,29 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../ui/collapsible'
 
-export const DataTable: FC<{
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  // biome-ignore lint/suspicious/noExplicitAny: This component is a generic table and we want to allow any type of data.
-  table: TanStackTable<any>
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+export interface DataTableProps<T> {
+  table: TanStackTable<T>
+  collapsibleContent?: ComponentType<{
+    row: Row<T>
+  }>
   footer?: boolean
-}> = ({ table, footer }) => {
+  onRowClick?: (e: MouseEvent, row: Row<T>) => void
+}
+
+export const DataTable = <T,>({
+  table,
+  footer,
+  collapsibleContent: CustomCollapsibleContent,
+  onRowClick,
+}: DataTableProps<T>) => {
   const rowModel = table.getRowModel()
   const footerGroups = table.getFooterGroups()
-  console.log('footerGroups', footerGroups)
 
   return (
     <div className="overflow-hidden rounded-md border">
@@ -48,24 +64,48 @@ export const DataTable: FC<{
         </TableHeader>
         <TableBody>
           {rowModel.rows?.length ? (
-            rowModel.rows.map(row => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-              >
-                {row.getVisibleCells().map(cell => (
-                  <TableCell
-                    key={cell.id}
-                    style={{ width: cell.column.getSize() }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            rowModel.rows.map(row => {
+              const rowContent = (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  onClick={onRowClick ? e => onRowClick(e, row) : undefined}
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: cell.column.getSize() }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )
+
+              return CustomCollapsibleContent ? (
+                <Collapsible key={row.id} asChild>
+                  {/** biome-ignore lint/complexity/noUselessFragments: children accept only 1 element */}
+                  <>
+                    <CollapsibleTrigger asChild>
+                      {rowContent}
+                    </CollapsibleTrigger>
+                    <CollapsibleContent asChild>
+                      <CustomCollapsibleContent row={row} />
+                    </CollapsibleContent>
+                  </>
+                </Collapsible>
+              ) : (
+                rowContent
+              )
+            })
           ) : (
             <TableRow>
-              <TableCell className="h-24 text-center">No results.</TableCell>
+              <TableCell colSpan={100} className="h-24 text-center">
+                No results.
+              </TableCell>
             </TableRow>
           )}
         </TableBody>
@@ -73,7 +113,7 @@ export const DataTable: FC<{
         {footer && (
           <TableFooter>
             <TableRow>
-              {table.getFooterGroups().map(footerGroup =>
+              {footerGroups.map(footerGroup =>
                 footerGroup.headers.map(footer => (
                   <TableCell
                     key={footer.id}

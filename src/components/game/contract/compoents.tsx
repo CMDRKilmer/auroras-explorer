@@ -1,25 +1,24 @@
 import type { FC } from 'react'
-import { Badge } from '@/components/ui/badge'
+import type { Contract } from '@/lib/api'
 import { dayjs } from '@/lib/format'
 import { getContractStatusLabel } from './utils'
 
-export const ContractStatus: FC<{ status: string }> = ({ status }) => {
+export const ContractStatus: FC<{ contract: Contract }> = ({ contract }) => {
+  const status = contract.Status
   return (
-    <Badge
-      variant={
+    <div
+      className={
         status === 'OPEN'
-          ? 'info'
-          : status === 'PARTIALLY_FULFILLED' || status === 'TERMINATED'
-            ? 'warning'
+          ? 'text-info'
+          : status === 'PARTIALLY_FULFILLED'
+            ? 'text-warning'
             : status === 'FULFILLED'
-              ? 'success'
-              : status === 'REJECTED' || status === 'CANCELLED'
-                ? 'error'
-                : 'disabled'
+              ? 'text-success'
+              : 'text-muted-foreground'
       }
     >
-      {getContractStatusLabel(status)}
-    </Badge>
+      {getContractStatusLabel(contract)}
+    </div>
   )
 }
 

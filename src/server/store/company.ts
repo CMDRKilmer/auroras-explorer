@@ -1,7 +1,7 @@
-import fs from 'node:fs/promises'
 import { memoize, pick } from 'es-toolkit'
-import { type Company, getCompanyByCode } from '@/lib/fio'
+import { getCompanyByCode, getCompanyByUsername } from '@/lib/fio'
 import { db } from '../common/db'
+import type { CompanyPO } from './type'
 
 const savedCompanyFields = [
   'UserDataId',
@@ -38,47 +38,61 @@ const savedCompanyFields = [
   'Timestamp',
 ] as const
 
-const getFromFileCache = async (code: string): Promise<Company | undefined> => {
-  const cacheFilePath = `./tmp/company_cache/${code}.json`
-  const exists = await fs
-    .stat(cacheFilePath)
-    .then(() => true)
-    .catch(() => false)
+export const getCompanyWithCache = memoize(
+  async ({
+    code,
+    username,
+  }: {
+    code?: string
+    username?: string
+  }): Promise<CompanyPO | undefined> => {
+    if (!code && !username) return
 
-  if (!exists) return
+    const query = db('fio_user_companies')
 
-  const data = await fs
-    .readFile(cacheFilePath, 'utf-8')
-    .then(data => JSON.parse(data))
-    .catch(() => {})
+    if (code) {
+      query.where('CompanyCode', code)
+    }
 
-  if (!data) return
+    if (username) {
+      query.where('UsernameUpper', username)
+    }
 
-  return data
+    const company = query.first()
+
+    if (company) {
+      return company
+    }
+
+    const data = code
+      ? await getCompanyByCode(code)
+      : username
+        ? await getCompanyByUsername(username)
+        : undefined
+
+    if (!data) return
+
+    const result = await db('fio_user_companies')
+      .insert({
+        ...pick(data, savedCompanyFields),
+        UsernameUpper: data.UserName.toUpperCase(),
+        UpdatedAt: new Date(),
+      })
+      .onConflict('UserDataId')
+      .merge()
+      .returning('*')
+
+    return result[0]
+  },
+)
+
+export const getCompanyByUsernames = async (
+  usernames: string[],
+): Promise<CompanyPO[]> => {
+  return db('fio_user_companies')
+    .select('*')
+    .whereIn(
+      'UsernameUpper',
+      usernames.map(u => u.toUpperCase()),
+    )
 }
-
-export const getCompanyByCodeWithCache = memoize(async (code: string) => {
-  const company = await db('fio_user_companies')
-    .where('CompanyCode', code)
-    .first()
-
-  if (company) {
-    return company
-  }
-
-  const data = await getFromFileCache(code).then(data => {
-    if (data) return data
-    return getCompanyByCode(code)
-  })
-
-  await db('fio_user_companies')
-    .insert({
-      ...pick(data, savedCompanyFields),
-      UsernameUpper: data.UserName.toUpperCase(),
-      UpdatedAt: new Date(),
-    })
-    .onConflict('UserDataId')
-    .merge()
-
-  return data
-})

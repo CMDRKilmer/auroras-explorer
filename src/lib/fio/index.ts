@@ -87,3 +87,9 @@ export const getCompanyByCode = async (code: string) => {
 
   return res.data
 }
+
+export const getCompanyByUsername = async (username: string) => {
+  const res = await fioClient.get<Company>(`/user/${username}`)
+
+  return res.data
+}

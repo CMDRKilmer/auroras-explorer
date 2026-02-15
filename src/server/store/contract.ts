@@ -1,4 +1,4 @@
-import { chunk, compact, keyBy } from 'es-toolkit'
+import { chunk, compact, keyBy, uniq } from 'es-toolkit'
 import type { Knex } from 'knex'
 import type { Contract } from '@/lib/api/types'
 import type { UserContract, UserContractCondition } from '@/lib/fio'
@@ -6,8 +6,9 @@ import { dayjs } from '@/lib/format'
 import { parseOrderBy } from '@/lib/order'
 import { db } from '../common/db'
 import { logger } from '../common/logger'
-import { getCompanyByCodeWithCache } from './company'
-import type { UserContractConditionPO, UserContractPO } from './type'
+import type { Pagination } from '../common/paging'
+import { getCompanyByUsernames, getCompanyWithCache } from './company'
+import type { ContractPO, UserContractConditionPO } from './type'
 
 export interface BulkSaveContractResult {
   savedContractsCount: number
@@ -65,16 +66,24 @@ export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
 
 export interface ListContractsOptions {
   submitters?: string[]
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
   order?: string
   types?: string[]
   participants?: string[]
+  /**
+   * if true, will only return contracts that are explicitly participated by the
+   * two participants, which means the contract must have one participant as
+   * provider and the other as customer. If false, will return contracts that
+   * have at least one of the participants, regardless of their role in the
+   * contract. Default is false.
+   */
+  explicit?: boolean
 }
 
 const getConditionsForContract = async (
   keys: { ContractId: string; UserNameSubmitted: string }[],
-) => {
+): Promise<UserContractConditionPO[]> => {
   const bindings = keys.flatMap(({ ContractId, UserNameSubmitted }) => {
     return [ContractId, UserNameSubmitted]
   })
@@ -98,7 +107,7 @@ const getConditionsForContract = async (
 }
 
 const formatContract = (
-  contract: UserContractPO,
+  contract: ContractPO,
   conditions: UserContractConditionPO[],
 ) => {
   return {
@@ -126,11 +135,10 @@ const handleListContractOptions = (
   query: Knex.QueryBuilder,
   {
     submitters,
-    limit = 50,
-    offset = 0,
     order = '-DateEpochMs',
     types,
     participants,
+    explicit = false,
   }: ListContractsOptions,
 ) => {
   if (submitters && submitters.length > 0) {
@@ -140,14 +148,25 @@ const handleListContractOptions = (
     query.whereIn('Type', types)
   }
   if (participants && participants.length > 0) {
-    query.where(function () {
+    if (explicit) {
       for (const participant of participants) {
-        this.orWhere('CustomerUsername', participant).orWhere(
-          'ProviderUsername',
-          participant,
-        )
+        query.where(function () {
+          this.where('CustomerUsername', participant).orWhere(
+            'ProviderUsername',
+            participant,
+          )
+        })
       }
-    })
+    } else {
+      query.where(function () {
+        for (const participant of participants) {
+          this.orWhere('CustomerUsername', participant).orWhere(
+            'ProviderUsername',
+            participant,
+          )
+        }
+      })
+    }
   }
   for (const { field, direction } of parseOrderBy(order, [
     'DateEpochMs',
@@ -155,7 +174,6 @@ const handleListContractOptions = (
   ])) {
     query.orderBy(field, direction)
   }
-  query.limit(limit).offset(offset)
 }
 
 export const listUserContracts = async (opts: ListContractsOptions) => {
@@ -172,12 +190,19 @@ export const listUserContracts = async (opts: ListContractsOptions) => {
   })
 }
 
-export const listContracts = async (opts: ListContractsOptions) => {
-  const query = db('contracts').select('*')
+const listContractsItems = async (
+  query: Knex.QueryBuilder,
+  opts: ListContractsOptions,
+) => {
+  const contracts: ContractPO[] = await query
+    .clone()
+    .select('*')
+    .limit(opts.limit)
+    .offset(opts.offset)
 
-  handleListContractOptions(query, opts)
-
-  const contracts = await query
+  if (contracts.length === 0) {
+    return []
+  }
 
   const conditions = await getConditionsForContract(
     contracts.map(c => {
@@ -188,9 +213,57 @@ export const listContracts = async (opts: ListContractsOptions) => {
     }),
   )
 
-  return contracts.map(contract => {
-    return formatContract(contract, conditions)
+  const companies = await getCompanyByUsernames(
+    uniq(contracts.flatMap(c => [c.CustomerUsername, c.ProviderUsername])),
+  )
+
+  const companyByUsername = keyBy(companies, c => c.UserName.toUpperCase())
+
+  const items = contracts.map(contract => {
+    const r = formatContract(contract, conditions) as unknown as Contract
+    const customerCompany =
+      companyByUsername[contract.CustomerUsername.toUpperCase()]
+    const providerCompany =
+      companyByUsername[contract.ProviderUsername.toUpperCase()]
+    return {
+      ...r,
+      CustomerUsername: customerCompany?.UserName ?? contract.CustomerUsername,
+      ProviderUsername: providerCompany?.UserName ?? contract.ProviderUsername,
+      CustomerCompanyName: customerCompany?.CompanyName,
+      ProviderCompanyName: providerCompany?.CompanyName,
+      CustomerCompanyCode: customerCompany?.CompanyCode,
+      ProviderCompanyCode: providerCompany?.CompanyCode,
+    }
   })
+
+  return items
+}
+
+const listContractsTotal = async (query: Knex.QueryBuilder) => {
+  const [{ total }] = await query.clone().count('* as total')
+  return Number(total)
+}
+
+export const listContracts = async (
+  opts: ListContractsOptions,
+): Promise<Pagination<Contract>> => {
+  const query = db('contracts')
+
+  handleListContractOptions(query, opts)
+
+  // const sql = query.toSQL().toNative()
+  // console.log(sql.sql)
+  // console.log(sql.bindings)
+
+  const [items, total] = await Promise.all([
+    listContractsItems(query, opts),
+    listContractsTotal(query),
+  ])
+
+  return {
+    items,
+    total,
+  }
 }
 
 export const getContractType = (conditions: UserContractCondition[]) => {
@@ -221,7 +294,7 @@ export const getContractType = (conditions: UserContractCondition[]) => {
 }
 
 type ToInsertedContract = Omit<
-  Contract,
+  ContractPO,
   'Conditions' | 'CreatedAt' | 'UpdatedAt'
 >
 
@@ -255,12 +328,16 @@ const normalizeContract = async ({
     // ignore country contracts
     return
   }
-  const partnerCompany = await getCompanyByCodeWithCache(PartnerCompanyCode)
+  const partnerCompany = await getCompanyWithCache({
+    code: PartnerCompanyCode,
+  })
 
   if (!partnerCompany) {
     logger.warn(`Partner company not found for code: ${PartnerCompanyCode}`)
     return
   }
+
+  const partnerUsername = partnerCompany.UserName.toUpperCase()
 
   return {
     ContractId,
@@ -277,9 +354,9 @@ const normalizeContract = async ({
     Status,
 
     CustomerUsername:
-      Party === 'CUSTOMER' ? UserNameSubmitted : partnerCompany.UserName,
+      Party === 'CUSTOMER' ? UserNameSubmitted : partnerUsername,
     ProviderUsername:
-      Party === 'PROVIDER' ? UserNameSubmitted : partnerCompany.UserName,
+      Party === 'PROVIDER' ? UserNameSubmitted : partnerUsername,
     Type: getContractType(Conditions),
     Timestamp,
     LastSubmittedBy: UserNameSubmitted,
@@ -304,7 +381,7 @@ export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
       const existingContract = existingContractsById[contract.ContractId]
       if (
         !existingContract ||
-        dayjs(existingContract.LastSubmittedBy).isBefore(
+        !dayjs(existingContract.LastSubmittedBy).isAfter(
           dayjs(contract.LastSubmittedBy),
         )
       ) {

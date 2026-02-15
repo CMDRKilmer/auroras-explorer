@@ -5,3 +5,5 @@ export const apiClient = axios.create({
   baseURL: config.apiBaseUrl,
   timeout: 10000,
 })
+
+export * from './types'
