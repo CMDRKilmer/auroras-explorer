@@ -10,10 +10,11 @@ interface GroupContractsParams {
   types?: string[]
   order?: string
   usernames?: string[]
+  statuses?: string[]
 }
 
 export const groupContractsQuery = (opt: GroupContractsParams) => {
-  const { groupId, usernames, types, pageSize, ...params } = opt
+  const { groupId, usernames, types, statuses, pageSize, ...params } = opt
   return queryOptions({
     queryKey: ['group-contracts', opt],
     queryFn: async () => {
@@ -23,6 +24,7 @@ export const groupContractsQuery = (opt: GroupContractsParams) => {
           params: {
             ...params,
             types: types?.join(','),
+            statuses: statuses?.join(','),
             usernames: usernames?.map(i => i.toUpperCase()).join(','),
             page_size: pageSize,
           },

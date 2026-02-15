@@ -1,27 +1,23 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { config } from '../common/config'
-import {
-  type ListContractsOptions,
-  listContracts,
-  listUserContracts,
-} from '../store/contract'
+import { type ListContractsOptions, listContracts } from '../store/contract'
 import { getGroupUserInfos, getGroupUsernames } from '../store/group'
 
 const app = new Hono()
 
 app.use('/*', cors())
 
-app.get('/api/user/:username/contracts', async c => {
-  const contracts = await listUserContracts({
-    submitters: [c.req.param('username')],
-    order: c.req.query('order'),
-    limit: Number(c.req.query('limit')) || 50,
-    offset: Number(c.req.query('offset')) || 0,
-  })
+// app.get('/api/user/:username/contracts', async c => {
+//   const contracts = await listUserContracts({
+//     submitters: [c.req.param('username')],
+//     order: c.req.query('order'),
+//     limit: Number(c.req.query('limit')) || 50,
+//     offset: Number(c.req.query('offset')) || 0,
+//   })
 
-  return c.json(contracts)
-})
+//   return c.json(contracts)
+// })
 
 app.get('/api/group/:groupId/contracts', async c => {
   const groupId = c.req.param('groupId')
@@ -40,6 +36,9 @@ app.get('/api/group/:groupId/contracts', async c => {
     offset: pageSize * (page - 1),
     types: c.req.query('types')
       ? (c.req.query('types') as string).split(',')
+      : undefined,
+    statuses: c.req.query('statuses')
+      ? (c.req.query('statuses') as string).split(',')
       : undefined,
     participants: usernames.map(u => u.toUpperCase()),
   }

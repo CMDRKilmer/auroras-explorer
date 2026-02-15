@@ -1,25 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
-import { ContractTable } from '@/components/game/contract/contract-table'
-import { groupContractsQuery } from '@/lib/query/contract'
+import { isHotkeyPressed } from 'react-hotkeys-hook'
+import { DataTable } from '@/components/common/data-table'
+import { LoadingPage } from '@/components/common/loading'
+import { Pagination } from '@/components/common/pagination'
+import { ContractDetail } from '@/components/game/contract/contract-detail'
 import { useGroupContractsPageContext } from './context'
 import { GroupContractsPageContextProvider } from './context-provider'
 import { Settings } from './settings'
 
 const GroupContractsPageInner = () => {
-  const { usernames } = useGroupContractsPageContext()
-
-  const {
-    data: contracts,
-    isLoading,
-    error,
-  } = useQuery(
-    groupContractsQuery({
-      groupId: '873386',
-      order: '-DateEpochMs',
-      types: ['TRADING', 'BUYING', 'SELLING', 'SHIPMENT'],
-      usernames: usernames.length > 0 ? usernames : undefined,
-    }),
-  )
+  const { contractsQuery, table, pagination } = useGroupContractsPageContext()
 
   return (
     <div className="p-4">
@@ -27,13 +16,30 @@ const GroupContractsPageInner = () => {
 
       <Settings />
 
-      {isLoading && <p>Loading contracts...</p>}
-      {error && (
-        <p className="text-red-500">Error: {(error as Error).message}</p>
-      )}
-      {contracts && (
+      {contractsQuery.isLoading && (
         <div>
-          <ContractTable contracts={contracts.items} />
+          <LoadingPage className="min-h-125" />
+        </div>
+      )}
+      {contractsQuery.error && (
+        <p className="text-red-500">Error: {contractsQuery.error.message}</p>
+      )}
+      {contractsQuery.data && (
+        <div>
+          <DataTable
+            table={table}
+            collapsibleContent={ContractDetail}
+            onRowClick={(e, row) => {
+              if (isHotkeyPressed('backquote')) {
+                e.preventDefault()
+                console.log(row.original)
+              }
+            }}
+          />
+
+          <div className="h-4" />
+
+          <Pagination table={table} pagination={pagination} />
         </div>
       )}
     </div>

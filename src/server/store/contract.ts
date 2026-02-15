@@ -3,10 +3,9 @@ import type { Knex } from 'knex'
 import type { Contract } from '@/lib/api/types'
 import type { UserContract, UserContractCondition } from '@/lib/fio'
 import { dayjs } from '@/lib/format'
-import { parseOrderBy } from '@/lib/order'
 import { db } from '../common/db'
 import { logger } from '../common/logger'
-import type { Pagination } from '../common/paging'
+import { handleOrderBy, type Pagination } from '../common/paging'
 import { getCompanyByUsernames, getCompanyWithCache } from './company'
 import type { ContractPO, UserContractConditionPO } from './type'
 
@@ -70,6 +69,7 @@ export interface ListContractsOptions {
   offset: number
   order?: string
   types?: string[]
+  statuses?: string[]
   participants?: string[]
   /**
    * if true, will only return contracts that are explicitly participated by the
@@ -131,13 +131,13 @@ const formatContract = (
   }
 }
 
-const handleListContractOptions = (
+const filterListContractOptions = (
   query: Knex.QueryBuilder,
   {
     submitters,
-    order = '-DateEpochMs',
     types,
     participants,
+    statuses,
     explicit = false,
   }: ListContractsOptions,
 ) => {
@@ -146,6 +146,9 @@ const handleListContractOptions = (
   }
   if (types && types.length > 0) {
     query.whereIn('Type', types)
+  }
+  if (statuses && statuses.length > 0) {
+    query.whereIn('Status', statuses)
   }
   if (participants && participants.length > 0) {
     if (explicit) {
@@ -168,37 +171,32 @@ const handleListContractOptions = (
       })
     }
   }
-  for (const { field, direction } of parseOrderBy(order, [
-    'DateEpochMs',
-    'ContractId',
-  ])) {
-    query.orderBy(field, direction)
-  }
 }
 
-export const listUserContracts = async (opts: ListContractsOptions) => {
-  const query = db('fio_user_contracts').select('*')
-
-  handleListContractOptions(query, opts)
-
-  const contracts = await query
-
-  const conditions = await getConditionsForContract(contracts)
-
-  return contracts.map(contract => {
-    return formatContract(contract, conditions)
-  })
-}
+// export const listUserContracts = async (opts: ListContractsOptions) => {
+// const query = db('fio_user_contracts').select('*')
+// filterListContractOptions(query, opts)
+// const contracts = await query
+// const conditions = await getConditionsForContract(contracts)
+// return contracts.map(contract => {
+//   return formatContract(contract, conditions)
+// })
+// }
 
 const listContractsItems = async (
   query: Knex.QueryBuilder,
   opts: ListContractsOptions,
 ) => {
-  const contracts: ContractPO[] = await query
-    .clone()
-    .select('*')
-    .limit(opts.limit)
-    .offset(opts.offset)
+  handleOrderBy(query, opts.order ?? '-DateEpochMs', [
+    'DateEpochMs',
+    'DueDateEpochMs',
+    'CreatedAt',
+    'UpdatedAt',
+  ])
+
+  query.limit(opts.limit).offset(opts.offset)
+
+  const contracts: ContractPO[] = await query.select('*')
 
   if (contracts.length === 0) {
     return []
@@ -249,15 +247,15 @@ export const listContracts = async (
 ): Promise<Pagination<Contract>> => {
   const query = db('contracts')
 
-  handleListContractOptions(query, opts)
+  filterListContractOptions(query, opts)
 
   // const sql = query.toSQL().toNative()
   // console.log(sql.sql)
   // console.log(sql.bindings)
 
   const [items, total] = await Promise.all([
-    listContractsItems(query, opts),
-    listContractsTotal(query),
+    listContractsItems(query.clone(), opts),
+    listContractsTotal(query.clone()),
   ])
 
   return {
