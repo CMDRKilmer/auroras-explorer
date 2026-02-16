@@ -48,13 +48,18 @@ export const getAllBuildings = createDataLoader<Building[]>(
   '/building/allbuildings',
 )
 
-export const getUserContracts = async (username: string, token: string) => {
+export const getUserContracts = async (
+  username: string,
+  token: string,
+  signal?: AbortSignal,
+) => {
   const res = await fioClient.get<UserContract[]>(
     `/contract/allcontracts/${username}`,
     {
       headers: {
         Authorization: token,
       },
+      signal,
     },
   )
 

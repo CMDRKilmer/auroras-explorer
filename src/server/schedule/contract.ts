@@ -47,12 +47,12 @@ export class SaveUserContractTask {
     }
   }
 
-  async saveUserContracts(username: string) {
+  async saveUserContracts(username: string, signal?: AbortSignal) {
     try {
       const contracts = await async.retry(
         {
           times: 5,
-          interval: (attemptCount: number) => 1000 * 2 ** attemptCount,
+          interval: (attemptCount: number) => 1000 * 2 ** attemptCount, // Exponential backoff: 2s, 4s, 8s, 16s, 32s
           errorFilter: (err: unknown) => {
             if (axios.isAxiosError(err)) {
               // Retry for all errors except 401 Unauthorized, which indicates no permission to access the user's contracts
@@ -62,7 +62,7 @@ export class SaveUserContractTask {
           },
         },
         async () => {
-          return await getUserContracts(username, this.token)
+          return await getUserContracts(username, this.token, signal)
         },
       )
       const result = await bulkSaveUserContracts(contracts)
@@ -122,29 +122,54 @@ export class SaveUserContractTask {
       normalizedContractsCount: 0,
     }
 
-    for (const username of this.usernames) {
-      logger.info(`Saving contracts for user ${username}`)
-      const result = await this.saveUserContracts(username).catch(err => {
-        logger.error(`Error in saveUserContracts for user ${username}`, err)
-        return null
-      })
-      logger.info(`Saved contracts for user ${username}`)
+    let timeout = false
 
-      if (result) {
-        statistics.successCount++
-        statistics.contractsCount += result.savedContractsCount
-        statistics.conditionsCount += result.savedConditionsCount
-        statistics.normalizedContractsCount +=
-          result.normalizedAndSavedContractsCount
-      } else {
-        statistics.errorCount++
+    const abortController = new AbortController()
+
+    const task = async () => {
+      for (const username of this.usernames) {
+        if (timeout) {
+          break
+        }
+        logger.info(`Saving contracts for user ${username}`)
+        const result = await this.saveUserContracts(
+          username,
+          abortController.signal,
+        ).catch(err => {
+          logger.error(`Error in saveUserContracts for user ${username}`, err)
+          return null
+        })
+        logger.info(`Saved contracts for user ${username}`)
+
+        if (result) {
+          statistics.successCount++
+          statistics.contractsCount += result.savedContractsCount
+          statistics.conditionsCount += result.savedConditionsCount
+          statistics.normalizedContractsCount +=
+            result.normalizedAndSavedContractsCount
+        } else {
+          statistics.errorCount++
+        }
       }
     }
 
-    logger.info(
-      `Finished executing SaveUserContractTask, statistics: ${JSON.stringify(
-        statistics,
-      )} Time taken: ${formatDuration(Date.now() - startTime)}`,
-    )
+    await Promise.race([
+      task().then(() => {
+        logger.info(
+          `Finished executing SaveUserContractTask, statistics: ${JSON.stringify(
+            statistics,
+          )} Time taken: ${formatDuration(Date.now() - startTime)}`,
+        )
+      }),
+      sleep(5 * 60 * 1000).then(() => {
+        timeout = true
+        abortController.abort()
+        logger.warn(
+          `SaveUserContractTask execution timed out after 5 minutes. Current statistics: ${JSON.stringify(
+            statistics,
+          )}`,
+        )
+      }),
+    ])
   }
 }
