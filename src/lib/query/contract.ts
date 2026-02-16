@@ -32,5 +32,6 @@ export const groupContractsQuery = (opt: GroupContractsParams) => {
       )
       return res.data
     },
+    enabled: !!groupId,
   })
 }
