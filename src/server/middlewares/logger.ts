@@ -1,6 +1,5 @@
 import { getConnInfo } from 'hono/bun'
 import { createMiddleware } from 'hono/factory'
-import { AppError } from '../common/error'
 import { logger } from '../common/logger'
 
 export const httpLogger = () =>
@@ -22,8 +21,4 @@ export const httpLogger = () =>
       params: c.req.param(),
       query: c.req.query(),
     })
-
-    if (!(c.error instanceof AppError)) {
-      logger.error('unhandled error', c.error)
-    }
   })

@@ -1,7 +1,7 @@
 CREATE TABLE "public"."users" (
   "username" TEXT NOT NULL,
-  "token" TEXT NOT NULL,
-  "created_at" timestamp NOT NULL,
-  "updated_at" timestamp NOT NULL,
+  "fio_token" TEXT NOT NULL,
+  "created_at" timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  "updated_at" timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
   PRIMARY KEY ("username")
 );

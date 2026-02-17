@@ -10,14 +10,17 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { useNavigates } from '@/hooks/use-navigates'
-import { useLocalStorage } from '@/hooks/use-storage'
+import { setItem, useLocalStorage } from '@/hooks/use-storage'
 import { formatTime } from '@/lib/format'
+import { queryClient } from '@/lib/query'
+import { identityQuery, useIdentity } from '@/lib/query/user'
 import TablerBrandDiscord from '~icons/tabler/brand-discord'
 import { NavMain } from './nav-main'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dataUpdatedAt = useLocalStorage<number>('ct-orders')
   const navigates = useNavigates()
+  const identity = useIdentity()
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -71,13 +74,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </a>
           </div>
         </div>
-        {/* <NavUser
-          user={{
-            name: 'Charlie Nguyen',
-            email: 'var(--action-hover)',
-            avatar: 'https://i.pravatar.cc/150?u=charlie.n',
-          }}
-        /> */}
+
+        {identity.data && (
+          <div className="mt-4 text-xs text-muted-foreground">
+            Logged in as {identity.data.username}
+            <button
+              type="button"
+              className="ml-4 underline cursor-pointer"
+              onClick={() => {
+                setItem('token', undefined)
+                queryClient.invalidateQueries(identityQuery())
+              }}
+            >
+              click to logout
+            </button>
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   )

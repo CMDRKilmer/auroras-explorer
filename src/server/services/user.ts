@@ -1,4 +1,4 @@
-import { memoize } from 'async'
+import { memoize, toSnakeCaseKeys } from 'es-toolkit'
 import { importPKCS8, importSPKI, jwtVerify, SignJWT } from 'jose'
 import { FioClient } from '@/lib/fio/client'
 import { config } from '../common/config'
@@ -33,11 +33,13 @@ export const exchangeFromFioToken = async (fioToken: string) => {
   })
 
   await db('users')
-    .insert({
-      username,
-      fioToken,
-      updatedAt: new Date(),
-    })
+    .insert(
+      toSnakeCaseKeys({
+        username,
+        fioToken,
+        updatedAt: new Date(),
+      }),
+    )
     .onConflict('username')
     .merge()
 

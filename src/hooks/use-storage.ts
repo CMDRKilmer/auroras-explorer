@@ -20,7 +20,12 @@ export const setItem = (key: string, value: unknown) => {
       return
     }
 
-    window.localStorage.setItem(key, JSON.stringify(value))
+    if (value === undefined) {
+      window.localStorage.removeItem(key)
+    } else {
+      window.localStorage.setItem(key, JSON.stringify(value))
+    }
+
     window.dispatchEvent(new StorageEvent('storage', { key }))
   } catch (_err) {
     // ignore error

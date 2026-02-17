@@ -1,30 +1,50 @@
 import { Hono } from 'hono'
 import { compress } from 'hono/compress'
 import { cors } from 'hono/cors'
+import { HTTPException } from 'hono/http-exception'
 import { config } from '../common/config'
-import { errorHandler } from '../middlewares/error-handler'
+import { AppError } from '../common/error'
+import { logger } from '../common/logger'
+import { authenticate, requireGroupAuth } from '../middlewares/auth'
 import { httpLogger } from '../middlewares/logger'
-import { requireGroupAuth } from '../middlewares/require-auth'
 import { exchangeFromFioToken } from '../services/user'
 import { type ListContractsOptions, listContracts } from '../store/contract'
 import { getGroupUserInfos, getGroupUsernames } from '../store/group'
+import type { Env } from './types'
 
-const app = new Hono()
+const app = new Hono<Env>()
 
 app.use(cors())
 app.use(compress())
-app.use(errorHandler())
 app.use(httpLogger())
+app.use(authenticate())
 
-app.on(['GET', 'POST'], '/api/group/:groupId/*', requireGroupAuth())
+app.onError((err, c) => {
+  if (err instanceof AppError) {
+    return c.json({ message: err.message }, err.statusCode)
+  }
+  if (err instanceof HTTPException) {
+    return err.getResponse()
+  }
+  logger.error('Unexpected error', err)
+  return c.json(
+    { message: 'An unexpected error occurred. Please try again.' },
+    500,
+  )
+})
 
 app.post('/api/token/exchange', async c => {
   const { fioToken } = await c.req.json()
   if (!fioToken) {
-    return c.json({ error: 'Missing x-fio-token header' }, 400)
+    return c.json({ error: 'No FIO token provided' }, 400)
   }
   const token = await exchangeFromFioToken(fioToken)
   return c.json({ token })
+})
+
+app.get('/api/identity', async c => {
+  const user = c.get('user')
+  return c.json(user)
 })
 
 // app.get('/api/user/:username/contracts', async c => {
@@ -37,6 +57,8 @@ app.post('/api/token/exchange', async c => {
 
 //   return c.json(contracts)
 // })
+
+app.use('/api/group/:groupId/*', requireGroupAuth())
 
 app.get('/api/group/:groupId/contracts', async c => {
   const groupId = c.req.param('groupId')
