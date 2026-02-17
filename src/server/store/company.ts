@@ -1,5 +1,5 @@
 import { memoize, pick } from 'es-toolkit'
-import { getCompanyByCode, getCompanyByUsername } from '@/lib/fio'
+import { FioClient } from '@/lib/fio/client'
 import { db } from '../common/db'
 import type { CompanyPO } from './type'
 
@@ -64,10 +64,12 @@ export const getCompanyWithCache = memoize(
       return company
     }
 
+    const fioClient = new FioClient()
+
     const data = code
-      ? await getCompanyByCode(code)
+      ? await fioClient.getCompanyByCode(code)
       : username
-        ? await getCompanyByUsername(username)
+        ? await fioClient.getCompanyByUsername(username)
         : undefined
 
     if (!data) return

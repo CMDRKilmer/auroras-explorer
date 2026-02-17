@@ -2,7 +2,10 @@ import { Hono } from 'hono'
 import { compress } from 'hono/compress'
 import { cors } from 'hono/cors'
 import { config } from '../common/config'
+import { errorHandler } from '../middlewares/error-handler'
 import { httpLogger } from '../middlewares/logger'
+import { requireGroupAuth } from '../middlewares/require-auth'
+import { exchangeFromFioToken } from '../services/user'
 import { type ListContractsOptions, listContracts } from '../store/contract'
 import { getGroupUserInfos, getGroupUsernames } from '../store/group'
 
@@ -10,7 +13,19 @@ const app = new Hono()
 
 app.use(cors())
 app.use(compress())
+app.use(errorHandler())
 app.use(httpLogger())
+
+app.on(['GET', 'POST'], '/api/group/:groupId/*', requireGroupAuth())
+
+app.post('/api/token/exchange', async c => {
+  const { fioToken } = await c.req.json()
+  if (!fioToken) {
+    return c.json({ error: 'Missing x-fio-token header' }, 400)
+  }
+  const token = await exchangeFromFioToken(fioToken)
+  return c.json({ token })
+})
 
 // app.get('/api/user/:username/contracts', async c => {
 //   const contracts = await listUserContracts({

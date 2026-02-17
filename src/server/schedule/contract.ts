@@ -1,7 +1,7 @@
 import async from 'async'
 import axios from 'axios'
 import { maxBy } from 'es-toolkit'
-import { getGroup, getUserContracts } from '@/lib/fio'
+import { FioClient } from '@/lib/fio/client'
 import { formatDuration } from '@/lib/format'
 import { sleep } from '@/lib/sleep'
 import { config } from '../common/config'
@@ -15,15 +15,18 @@ export class SaveUserContractTask {
   lastExecutedAt = 0
   running = false
   executeInterval = 10 * 60 * 1000 // 10 minutes
+  fioClient: FioClient
 
   constructor(
     public groupId: string,
     public token: string,
-  ) {}
+  ) {
+    this.fioClient = new FioClient(token)
+  }
 
   async init() {
     logger.info('Initializing SaveUserContractTask...')
-    const group = await getGroup(config.fio.groupId, config.fio.apiToken)
+    const group = await this.fioClient.getGroup(config.fio.groupId)
     const usernames = group.GroupUsers.map(u => u.GroupUserName)
     this.usernames = usernames
     await updateUserGroups(this.groupId, this.usernames)
@@ -62,7 +65,7 @@ export class SaveUserContractTask {
           },
         },
         async () => {
-          return await getUserContracts(username, this.token, signal)
+          return await this.fioClient.getUserContracts(username, { signal })
         },
       )
       const result = await bulkSaveUserContracts(contracts)

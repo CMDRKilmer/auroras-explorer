@@ -1,6 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import type { AxiosRequestConfig } from 'axios'
 import { createStore, useStore } from 'zustand'
-import * as fio from '@/lib/fio'
+import type * as fio from '@/lib/fio'
+import { fioClient } from '@/lib/fio'
 import { getDataWithCache } from './fs'
 
 export interface GameData {
@@ -31,7 +33,7 @@ export const useDataLoadingState = () => useStore(dataLoadingStateStore)
 
 interface LoaderConfig<T = unknown> {
   key: string
-  fn: (opt?: fio.LoadDataOptions) => Promise<T>
+  fn: (opt?: AxiosRequestConfig) => Promise<T>
   expiryMs?: number
   apply: (g: GameData, data: T) => void
 }
@@ -44,7 +46,7 @@ const addLoader = <T>(config: LoaderConfig<T>) => {
 
 addLoader({
   key: 'orders',
-  fn: fio.getOrdersData,
+  fn: fioClient.getOrdersData,
   expiryMs: 1000 * 60 * 5, // 5 minutes
   apply: (g, data) => {
     g.orders = data
@@ -53,7 +55,7 @@ addLoader({
 
 addLoader({
   key: 'materials',
-  fn: fio.getAllMaterials,
+  fn: fioClient.getAllMaterials,
   apply: (g, data) => {
     g.materials = data.toSorted((a, b) => a.Ticker.localeCompare(b.Ticker))
     g.materialsByTicker = {}
@@ -65,7 +67,7 @@ addLoader({
 
 addLoader({
   key: 'recipes',
-  fn: fio.getAllRecipes,
+  fn: fioClient.getAllRecipes,
   apply: (g, data) => {
     g.recipes = data
   },
@@ -73,7 +75,7 @@ addLoader({
 
 addLoader({
   key: 'exchanges',
-  fn: fio.getAllExchanges,
+  fn: fioClient.getAllExchanges,
   apply: (g, data) => {
     g.exchanges = data
   },
@@ -81,7 +83,7 @@ addLoader({
 
 addLoader({
   key: 'buildings',
-  fn: fio.getAllBuildings,
+  fn: fioClient.getAllBuildings,
   apply: (g, data) => {
     g.buildings = data.toSorted((a, b) => a.Ticker.localeCompare(b.Ticker))
     g.buildingsByTicker = {}
@@ -104,8 +106,8 @@ const loadGameData = async (): Promise<GameData> => {
 
   await Promise.all(
     loaders.map(async ({ key, fn, apply, expiryMs }) => {
-      const opt: fio.LoadDataOptions = {
-        onProgress(event) {
+      const opt: AxiosRequestConfig = {
+        onDownloadProgress(event) {
           console.log('progress', { key, event })
         },
       }
