@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { setItem } from '@/hooks/use-storage'
 import { apiClient } from '@/lib/api'
+import { queryClient } from '@/lib/query'
 import { cn } from '@/lib/utils'
 import { AppError } from '@/server/common/error'
 
@@ -32,6 +33,10 @@ export const LoginForm: FC<LoginFormProps> = ({ className, ...props }) => {
         fioToken,
       })
       return res.data.token as string
+    },
+    onSuccess: token => {
+      setItem('token', token)
+      queryClient.clear()
     },
   })
 
@@ -55,11 +60,7 @@ export const LoginForm: FC<LoginFormProps> = ({ className, ...props }) => {
           <form
             onSubmit={e => {
               e.preventDefault()
-              exchangeTokenMutation.mutate(token, {
-                onSuccess: token => {
-                  setItem('token', token)
-                },
-              })
+              exchangeTokenMutation.mutate(token)
             }}
           >
             <FieldGroup>
