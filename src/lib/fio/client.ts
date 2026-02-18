@@ -38,7 +38,8 @@ export class FioClient {
     fn: (...args: Args) => Omit<AxiosRequestConfig, 'method'>,
   ) {
     return async (...args: [...Args, AxiosRequestConfig?]) => {
-      const opt = args.pop() as AxiosRequestConfig
+      const opt =
+        args.length > fn.length ? (args.pop() as AxiosRequestConfig) : {}
       const res = await this.httpClient.request<T>({
         method: 'GET',
         ...fn(...(args as unknown as Args)),
@@ -62,8 +63,8 @@ export class FioClient {
     }),
   )
   getGroups = this.createLoader<string[]>('/auth/groups')
-  getGroup = this.createMethod<Group, [groupId: string]>((groupId: string) => ({
-    url: `/group/${groupId}`,
+  getGroup = this.createMethod<Group, [groupId: string]>(groupId => ({
+    url: `/auth/group/${groupId}`,
   }))
   getCompanyByCode = this.createMethod<Company, [companyCode: string]>(
     (companyCode: string) => ({
