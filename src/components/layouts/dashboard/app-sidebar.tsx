@@ -1,6 +1,7 @@
 import { IconInnerShadowTop } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { Time } from '@/components/common/time'
+import { Button } from '@/components/ui/button'
 import {
   Sidebar,
   SidebarContent,
@@ -14,6 +15,7 @@ import { useNavigates } from '@/hooks/use-navigates'
 import { setItem, useLocalStorage } from '@/hooks/use-storage'
 import { queryClient } from '@/lib/query'
 import { identityQuery, useIdentity } from '@/lib/query/user'
+import MdiLogoutVariant from '~icons/mdi/logout-variant'
 import TablerBrandDiscord from '~icons/tabler/brand-discord'
 import { NavMain } from './nav-main'
 
@@ -75,18 +77,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
 
         {identity.data && (
-          <div className="mt-4 text-xs text-muted-foreground">
-            Logged in as {identity.data.username}
-            <button
+          <div className="mt-4 text-xs text-muted-foreground gap-1 flex items-center">
+            Logged in as
+            <span className="underline">{identity.data.username}</span>
+            <Button
               type="button"
               className="ml-4 underline cursor-pointer"
               onClick={() => {
                 setItem('token', undefined)
                 queryClient.invalidateQueries(identityQuery())
               }}
+              size="xs"
+              variant="ghost"
             >
-              click to logout
-            </button>
+              <MdiLogoutVariant />
+              logout
+            </Button>
           </div>
         )}
       </SidebarFooter>

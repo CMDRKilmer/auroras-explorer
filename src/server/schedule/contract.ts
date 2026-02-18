@@ -6,6 +6,7 @@ import { formatDuration } from '@/lib/format'
 import { sleep } from '@/lib/sleep'
 import { config } from '../common/config'
 import { logger } from '../common/logger'
+import { PriceService } from '../services/price'
 import { bulkSaveUserContracts } from '../store/contract'
 import { updateUserGroups } from '../store/group'
 import { type SyncStatus, updateSyncStatus } from '../store/status'
@@ -16,6 +17,8 @@ export class SaveUserContractTask {
   running = false
   executeInterval = 10 * 60 * 1000 // 10 minutes
   fioClient: FioClient
+
+  priceService = new PriceService()
 
   constructor(
     public groupId: string,
@@ -31,6 +34,7 @@ export class SaveUserContractTask {
     this.usernames = usernames
     await updateUserGroups(this.groupId, this.usernames)
     logger.info(`Found ${this.usernames.length} users in group ${this.groupId}`)
+    await this.priceService.init()
   }
 
   async run() {
@@ -68,7 +72,7 @@ export class SaveUserContractTask {
           return await this.fioClient.getUserContracts(username, { signal })
         },
       )
-      const result = await bulkSaveUserContracts(contracts)
+      const result = await bulkSaveUserContracts(this.priceService, contracts)
       const syncStatus: Partial<SyncStatus> = {
         username,
         lastContSyncAt: new Date(),

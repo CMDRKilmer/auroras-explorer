@@ -33,5 +33,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "tmp/db.ts"]
+  "include": ["src", "tests", "scripts"]
 }

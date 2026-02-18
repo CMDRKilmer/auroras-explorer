@@ -5,9 +5,13 @@ export type UserContractPO = UserContract & {
   CreatedAt: Date
 }
 
-export type UserContractConditionPO = UserContractCondition & {
+export type UserContractConditionPO = Omit<
+  UserContractCondition,
+  'Dependencies'
+> & {
   ContractId: string
   UserNameSubmitted: string
+  Dependencies: string[]
 }
 
 export type ContractPO = Omit<

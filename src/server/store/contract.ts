@@ -6,6 +6,8 @@ import { dayjs } from '@/lib/format'
 import { db } from '../common/db'
 import { logger } from '../common/logger'
 import { handleOrderBy, type Pagination } from '../common/paging'
+import { matchAndUpdateContractTags } from '../services/contract/match-contract'
+import type { PriceService } from '../services/price'
 import { getCompanyByUsernames, getCompanyWithCache } from './company'
 import type { ContractPO, UserContractConditionPO } from './type'
 
@@ -15,7 +17,10 @@ export interface BulkSaveContractResult {
   normalizedAndSavedContractsCount: number
 }
 
-export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
+export const bulkSaveUserContracts = async (
+  priceService: PriceService,
+  contracts: UserContract[],
+) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const contractsToSave = contracts.map(({ Conditions, ...contract }) => {
     return {
@@ -55,9 +60,16 @@ export const bulkSaveUserContracts = async (contracts: UserContract[]) => {
       .merge()
   }
 
+  const newContractIds: string[] = []
   for (const chunkedContracts of chunk(contracts, 50)) {
-    result.normalizedAndSavedContractsCount =
+    const { mergedCount, newContractIds } =
       await mergeAndSaveContracts(chunkedContracts)
+    result.normalizedAndSavedContractsCount = mergedCount
+    newContractIds.push(...newContractIds)
+  }
+
+  for (const contractId of newContractIds) {
+    await matchAndUpdateContractTags(priceService, contractId)
   }
 
   return result
@@ -361,7 +373,12 @@ const normalizeContract = async ({
   }
 }
 
-export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
+export const mergeAndSaveContracts = async (
+  contracts: UserContract[],
+): Promise<{
+  mergedCount: number
+  newContractIds: string[]
+}> => {
   const contractIds = contracts.map(c => c.ContractId)
   const normalizedContracts = await Promise.all(
     contracts.map(normalizeContract),
@@ -374,9 +391,19 @@ export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
       .whereIn('ContractId', contractIds)
 
     const existingContractsById = keyBy(existingContracts, c => c.ContractId)
+    const result: {
+      mergedCount: number
+      newContractIds: string[]
+    } = {
+      mergedCount: 0,
+      newContractIds: [],
+    }
 
     for (const contract of validNormalizedContracts) {
       const existingContract = existingContractsById[contract.ContractId]
+      if (!existingContract) {
+        result.newContractIds.push(contract.ContractId)
+      }
       if (
         !existingContract ||
         !dayjs(existingContract.LastSubmittedBy).isAfter(
@@ -384,11 +411,12 @@ export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
         )
       ) {
         toInsert.push(contract)
+        result.mergedCount += 1
       }
     }
 
     if (toInsert.length === 0) {
-      return 0
+      return result
     }
 
     await trx('contracts')
@@ -403,6 +431,6 @@ export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
       .onConflict('ContractId')
       .merge()
 
-    return toInsert.length
+    return result
   })
 }

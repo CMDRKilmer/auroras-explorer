@@ -1,8 +1,7 @@
-import type { ContractPO } from '@/server/store/type'
-import type { UserContractCondition } from '../fio'
+import type { ContractPO, UserContractConditionPO } from '@/server/store/type'
 
 export interface Contract extends ContractPO {
-  Conditions: UserContractCondition[]
+  Conditions: UserContractConditionPO[]
   CustomerCompanyName: string
   ProviderCompanyName: string
   CustomerCompanyCode: string
