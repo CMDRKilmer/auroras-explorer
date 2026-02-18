@@ -2,7 +2,7 @@ import { isHotkeyPressed } from 'react-hotkeys-hook'
 import { DataTable } from '@/components/common/data-table'
 import { LoadingPage } from '@/components/common/loading'
 import { Pagination } from '@/components/common/pagination'
-import { ContractDetail } from '@/components/game/contract/contract-detail'
+import { ContractDetailInDataTable } from '@/components/game/contract/contract-detail'
 import { useGroupContractsPageContext } from './context'
 import { GroupContractsPageContextProvider } from './context-provider'
 import { Settings } from './settings'
@@ -28,7 +28,7 @@ const GroupContractsPageInner = () => {
         <div>
           <DataTable
             table={table}
-            collapsibleContent={ContractDetail}
+            collapsibleContent={ContractDetailInDataTable}
             onRowClick={(e, row) => {
               if (isHotkeyPressed('backquote')) {
                 e.preventDefault()

@@ -12,6 +12,13 @@ describe('match contract', () => {
     const matcher = new ContractMatcher(Conditions)
     matcher.match()
     expect(matcher.type).toBe('BUYING')
+    expect(matcher.tradings.length).toBe(5)
+    expect(matcher.tradings[0]).toEqual({
+      ticker: 'COF',
+      quantity: 21,
+      currency: 'ICA',
+      totalPrice: 1,
+    })
   })
 
   it('should match selling contract correctly', () => {
@@ -20,6 +27,13 @@ describe('match contract', () => {
     const matcher = new ContractMatcher(Conditions)
     matcher.match()
     expect(matcher.type).toBe('SELLING')
+    expect(matcher.tradings.length).toBe(4)
+    expect(matcher.tradings[0]).toEqual({
+      ticker: 'LBH',
+      quantity: 30,
+      currency: 'ICA',
+      totalPrice: 22500,
+    })
   })
 
   it('should match shipment contract correctly', () => {

@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { getRouteApi } from '@tanstack/react-router'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  getCoreRowModel,
+  useReactTable,
+  type VisibilityState,
+} from '@tanstack/react-table'
 import { type FC, type ReactNode, useMemo, useState } from 'react'
 import { columns } from '@/components/game/contract/contract-table/columns'
 import { groupContractsQuery } from '@/lib/query/contract'
@@ -16,6 +20,8 @@ export const GroupContractsPageContextProvider: FC<{
   const [usernames, setUsernames] = useState<string[]>([])
   const [type, setType] = useState<string>('All')
   const [status, setStatus] = useState<string>('All')
+
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -41,7 +47,9 @@ export const GroupContractsPageContextProvider: FC<{
     getRowId: row => row.ContractId,
     state: {
       pagination,
+      columnVisibility,
     },
+    onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
     manualPagination: true,
     rowCount: contractsQuery.data?.total || 0,

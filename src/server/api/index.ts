@@ -82,6 +82,9 @@ app.get('/api/group/:groupId/contracts', async c => {
       ? (c.req.query('statuses') as string).split(',')
       : undefined,
     participants: usernames.map(u => u.toUpperCase()),
+    tags: c.req.query('tags')
+      ? (c.req.query('tags') as string).split(',').map(t => t.trim())
+      : undefined,
   }
 
   if (usernamesParam) {

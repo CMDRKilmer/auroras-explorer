@@ -91,6 +91,7 @@ export interface ListContractsOptions {
    * contract. Default is false.
    */
   explicit?: boolean
+  tags?: string[]
 }
 
 const getConditionsForContract = async (
@@ -151,6 +152,7 @@ const filterListContractOptions = (
     participants,
     statuses,
     explicit = false,
+    tags,
   }: ListContractsOptions,
 ) => {
   if (submitters && submitters.length > 0) {
@@ -161,6 +163,9 @@ const filterListContractOptions = (
   }
   if (statuses && statuses.length > 0) {
     query.whereIn('Status', statuses)
+  }
+  if (tags && tags.length > 0) {
+    query.whereJsonSupersetOf('Tags', tags)
   }
   if (participants && participants.length > 0) {
     if (explicit) {

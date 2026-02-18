@@ -8,9 +8,8 @@ import MdiClose from '~icons/mdi/close'
 import { ConditionBrief } from './condition-brief'
 
 export const ContractDetail: FC<{
-  row: Row<Contract>
-}> = ({ row }) => {
-  const contract = row.original
+  contract: Contract
+}> = ({ contract }) => {
   return (
     <tr>
       <td colSpan={100} className="bg-secondary p-4">
@@ -53,4 +52,12 @@ export const ContractDetail: FC<{
       </td>
     </tr>
   )
+}
+
+export const ContractDetailInDataTable: FC<{
+  row: Row<Contract>
+}> = ({ row }) => {
+  const contract = row.original
+
+  return <ContractDetail contract={contract} />
 }

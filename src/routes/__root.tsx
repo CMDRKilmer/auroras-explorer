@@ -1,12 +1,10 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/layouts/dashboard/app-sidebar'
 import { SiteHeader } from '@/components/layouts/dashboard/site-header'
-import { NotFoundPage } from '@/components/pages/not-found-page'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 export const Route = createRootRoute({
   component: RootComponent,
-  notFoundComponent: NotFoundPage,
 })
 
 function RootComponent() {

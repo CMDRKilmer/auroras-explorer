@@ -1,6 +1,6 @@
 import { capitalize } from 'es-toolkit'
 import type { FC } from 'react'
-import type { UserContractCondition } from '@/lib/fio'
+import type { UserContractConditionPO } from '@/server/store/type'
 import { MaterialTile } from '../material-tile'
 
 // HEADQUARTERS_UPGRADE
@@ -29,7 +29,7 @@ import { MaterialTile } from '../material-tile'
 // CONTRIBUTION
 
 export const ConditionBrief: FC<{
-  condition: UserContractCondition
+  condition: UserContractConditionPO
 }> = ({ condition }) => {
   if (condition.Type === 'PAYMENT') {
     return (

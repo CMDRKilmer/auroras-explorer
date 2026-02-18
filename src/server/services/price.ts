@@ -30,6 +30,7 @@ export class PriceService {
         prices.reduce((sum, price) => sum + price, 0) / prices.length
       this.avgPriceMap[ticker] = avgPrice
     }
+    this.lastUpdated = Date.now()
   }
 
   async init() {
@@ -50,7 +51,6 @@ export class PriceService {
 
       try {
         await this.updateData()
-        this.lastUpdated = Date.now()
         logger.info('Price data updated successfully')
       } catch (err: unknown) {
         logger.error('Failed to update price data', err)

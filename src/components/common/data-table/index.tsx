@@ -5,6 +5,11 @@ import {
 } from '@tanstack/react-table'
 import type { ComponentType, MouseEvent } from 'react'
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
   Table,
   TableBody,
   TableCell,
@@ -13,11 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '../ui/collapsible'
 
 export interface DataTableProps<T> {
   table: TanStackTable<T>

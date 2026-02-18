@@ -7,7 +7,6 @@ const main = async () => {
   const priceService = new PriceService()
   await priceService.init()
   for await (const contract of db('contracts')
-    .where('Tags', [])
     .orderBy('CreatedAt', 'ASC')
     .stream()) {
     const tags = await matchAndUpdateContractTags(

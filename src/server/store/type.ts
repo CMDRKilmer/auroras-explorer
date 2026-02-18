@@ -40,6 +40,7 @@ export type ContractPO = Omit<
   ProviderUsername: string
 
   Type: string
+  Tags: string[]
   Timestamp: string // when the contract was submitted by the user
   CreatedAt: string // when the contract was created in the server database
   UpdatedAt: string // when the contract was synced to the server

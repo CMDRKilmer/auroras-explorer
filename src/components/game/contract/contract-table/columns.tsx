@@ -1,13 +1,19 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import type { Contract } from '@/lib/api/types'
 import MdiArrowLeftRight from '~icons/mdi/arrow-left-right'
-import { ContractStatus, DueDateBadge } from '../compoents'
+import {
+  ContractItems,
+  ContractLocation,
+  ContractStatus,
+  ContractType,
+  DueDateBadge,
+} from '../components'
 
 const columnHelper = createColumnHelper<Contract>()
 
 export const columns = [
   columnHelper.display({
-    id: 'id',
+    id: 'Id',
     header: 'ID',
     cell: row => {
       const contract = row.row.original
@@ -18,7 +24,34 @@ export const columns = [
       )
     },
   }),
+
+  columnHelper.accessor('Type', {
+    id: 'Type',
+    header: 'Type',
+    cell: row => {
+      return <ContractType type={row.getValue()} />
+    },
+  }),
+
+  columnHelper.display({
+    id: 'Items',
+    header: 'Items',
+    cell: row => {
+      return <ContractItems contract={row.row.original} max={4} />
+    },
+    minSize: 250,
+  }),
+
+  columnHelper.display({
+    id: 'Location',
+    header: 'Location',
+    cell: row => {
+      return <ContractLocation contract={row.row.original} />
+    },
+  }),
+
   columnHelper.accessor('Status', {
+    id: 'Status',
     header: 'Status',
     cell: row => {
       const contract = row.row.original
@@ -27,7 +60,7 @@ export const columns = [
   }),
 
   columnHelper.display({
-    id: 'partner',
+    id: 'Partner',
     header: 'Partner',
     cell: row => {
       const contract = row.row.original
@@ -41,7 +74,12 @@ export const columns = [
     },
   }),
 
+  columnHelper.display({
+    id: 'Tags',
+  }),
+
   columnHelper.accessor('DateEpochMs', {
+    id: 'Created At',
     header: 'Created At',
     cell: row => {
       const date = new Date(row.getValue())
@@ -52,6 +90,7 @@ export const columns = [
   }),
 
   columnHelper.accessor('DueDateEpochMs', {
+    id: 'Due Date',
     header: 'Due Date',
     cell: row => {
       return <DueDateBadge dueDateMs={row.getValue()} />

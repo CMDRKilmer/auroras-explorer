@@ -68,6 +68,8 @@
         "@biomejs/biome": "^2.3.12",
         "@iconify-json/fa": "^1.2.2",
         "@iconify-json/hugeicons": "^1.2.23",
+        "@iconify-json/icon-park-outline": "^1.2.4",
+        "@iconify-json/material-symbols": "^1.2.55",
         "@iconify-json/mdi": "^1.2.3",
         "@iconify-json/ri": "^1.2.10",
         "@iconify-json/stash": "^1.2.4",
@@ -280,6 +282,10 @@
     "@iconify-json/fa": ["@iconify-json/fa@1.2.2", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-Rw0L97uO3W0Gy2rq4cM/TH3QjzuPuRca1F2steumZ57zOeheGQdiqo50O6KHjm+WgImmV92IFPUTU6eiaJsrTw=="],
 
     "@iconify-json/hugeicons": ["@iconify-json/hugeicons@1.2.23", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-gJ/V0xzM5WTA5qzBOMa/N/DojbHLliJN4SWHUOTNUOdEFFnjiF7XEjR8qqZhBF2hWNpt0SROXoq/xdOj6ZA9xA=="],
+
+    "@iconify-json/icon-park-outline": ["@iconify-json/icon-park-outline@1.2.4", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-NyZxXe2gD2TbTOyoRRMdtEJhr6i2KQCdDlYYoOn5oZLndQjwpIhw79hzeFhXvP38/o40D3gQ+l+IaSJgbB+0TQ=="],
+
+    "@iconify-json/material-symbols": ["@iconify-json/material-symbols@1.2.55", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-9EHfqSpzXxQb5neA5/n5GcF15rccKG+oBJDwh/s8mmxfYswY1A4dKYPOWXCqrWMe/J3CmHb0tXFloscVarrqkQ=="],
 
     "@iconify-json/mdi": ["@iconify-json/mdi@1.2.3", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg=="],
 

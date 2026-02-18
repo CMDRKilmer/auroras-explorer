@@ -11,6 +11,7 @@ interface GroupContractsParams {
   order?: string
   usernames?: string[]
   statuses?: string[]
+  tags?: string[]
 }
 
 export const groupContractsQuery = (opt: GroupContractsParams) => {

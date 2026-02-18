@@ -1,23 +1,13 @@
 import { ContractTags } from '@/lib/constants'
 import { ContractMatcher } from '@/lib/game/match-contract'
 import { db } from '@/server/common/db'
+import type { UserContractConditionPO } from '@/server/store/type'
 import type { PriceService } from '../price'
 
-export const matchAndUpdateContractTags = async (
+export const matchContractTags = async (
   priceService: PriceService,
-  contractId: string,
-  dryRun = false,
+  sortedConditions: UserContractConditionPO[],
 ) => {
-  const contract = await db('contracts').where('ContractId', contractId).first()
-  if (!contract) {
-    throw new Error(`Contract with id ${contractId} not found`)
-  }
-  const conditions = await db('fio_user_contract_conditions')
-    .where('ContractId', contractId)
-    .where('UserNameSubmitted', contract.LastSubmittedBy)
-  const sortedConditions = conditions.sort(
-    (a, b) => a.ConditionIndex - b.ConditionIndex,
-  )
   const matcher = new ContractMatcher(sortedConditions)
   matcher.match()
 
@@ -54,14 +44,33 @@ export const matchAndUpdateContractTags = async (
     tags.add(ContractTags.PRICE_NORMAL)
   }
 
+  return [...tags]
+}
+
+export const matchAndUpdateContractTags = async (
+  priceService: PriceService,
+  contractId: string,
+  dryRun = false,
+) => {
+  const contract = await db('contracts').where('ContractId', contractId).first()
+  if (!contract) {
+    throw new Error(`Contract with id ${contractId} not found`)
+  }
+  const conditions = await db('fio_user_contract_conditions')
+    .where('ContractId', contractId)
+    .where('UserNameSubmitted', contract.LastSubmittedBy)
+  const sortedConditions = conditions.sort(
+    (a, b) => a.ConditionIndex - b.ConditionIndex,
+  )
+
+  const tags = await matchContractTags(priceService, sortedConditions)
+
   if (!dryRun) {
-    await db('contracts')
-      .where('ContractId', contractId)
-      .update({
-        Tags: [...tags],
-        UpdatedAt: new Date(),
-      })
+    await db('contracts').where('ContractId', contractId).update({
+      Tags: tags,
+      UpdatedAt: new Date(),
+    })
   }
 
-  return [...tags]
+  return tags
 }

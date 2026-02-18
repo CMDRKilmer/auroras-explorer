@@ -3,6 +3,7 @@ import ShipmentPreviewImg from '@/assets/images/shipment-preview.webp'
 import HugeiconsCargoShip from '~icons/hugeicons/cargo-ship'
 import MdiAccountGroupOutline from '~icons/mdi/account-group-outline'
 import MdiCompassOutline from '~icons/mdi/compass-outline'
+import MdiDollar from '~icons/mdi/dollar'
 import MdiInvoiceListOutline from '~icons/mdi/invoice-list-outline'
 
 export const useNavigates = () => {
@@ -34,6 +35,12 @@ export const useNavigates = () => {
       title: 'Group Contracts',
       url: '/group/873386/contracts/',
       icon: MdiInvoiceListOutline,
+      category: 'Group Tools',
+    },
+    {
+      title: 'Price Watch',
+      url: '/group/873386/price-watch/',
+      icon: MdiDollar,
       category: 'Group Tools',
     },
   ]

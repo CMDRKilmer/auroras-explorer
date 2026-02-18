@@ -36,6 +36,8 @@ export class ContractMatcher {
   reset() {
     this.index = 0
     this.tradings = []
+    this.shipments = []
+    this.type = ''
   }
 
   tryMatch(matcher: ContractPatternMatcher) {
@@ -81,7 +83,7 @@ const matchBuyingContractPattern: ContractPatternMatcher = {
     ) {
       matcher.tradings.push({
         ticker: b.MaterialTicker,
-        quantity: b.Amount,
+        quantity: +b.MaterialAmount,
         currency: a.Currency,
         totalPrice: a.Amount,
       })
@@ -116,7 +118,7 @@ const matchSellingContractPattern: ContractPatternMatcher = {
     ) {
       matcher.tradings.push({
         ticker: a.MaterialTicker,
-        quantity: a.MaterialAmount,
+        quantity: +a.MaterialAmount,
         currency: b.Currency,
         totalPrice: b.Amount,
       })
