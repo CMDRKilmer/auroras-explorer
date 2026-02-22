@@ -2,19 +2,30 @@ import type { BasePlanner } from './types'
 
 export const parseRecipeId = (recipeId: string) => {
   const [building, recipe] = recipeId.split('#')
-  const [inputs, outputs] = recipe.split('=>').map(items =>
+  const [a, b] = recipe.split('=>').map(items =>
     items.split(' ').map(item => {
-      const [count, ticker] = item.split('x')
+      const [a, b] = item.split('x')
+      if (b) {
+        // if 2nd part is present, it means the item is in the format of "COUNTxTICKER", e.g. "2xFEO"
+        return {
+          count: +a,
+          ticker: b,
+        }
+      }
+      // otherwise, it means the item is in the format of "TICKER", e.g. "FEO"
       return {
-        count: +count,
-        ticker,
+        count: 0,
+        ticker: a,
       }
     }),
   )
+
   return {
     building,
-    inputs,
-    outputs,
+    // following two fields are not always present, e.g. for mining recipe
+    // so we default them to empty array to avoid dealing with undefined later
+    inputs: b ? a : [],
+    outputs: b ? b : a,
   }
 }
 
