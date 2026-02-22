@@ -1,6 +1,7 @@
 import { ContractTags } from '@/lib/constants'
 import { ContractMatcher } from '@/lib/game/match-contract'
 import { db } from '@/server/common/db'
+import { logger } from '@/server/common/logger'
 import type { UserContractConditionPO } from '@/server/store/type'
 import type { PriceService } from '../price'
 
@@ -71,6 +72,8 @@ export const matchAndUpdateContractTags = async (
       UpdatedAt: new Date(),
     })
   }
+
+  logger.debug(`Contract ${contractId} matched with tags: ${tags.join(', ')}`)
 
   return tags
 }

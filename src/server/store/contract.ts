@@ -60,15 +60,15 @@ export const bulkSaveUserContracts = async (
       .merge()
   }
 
-  const newContractIds: string[] = []
+  const allNewContractIds: string[] = []
   for (const chunkedContracts of chunk(contracts, 50)) {
     const { mergedCount, newContractIds } =
       await mergeAndSaveContracts(chunkedContracts)
     result.normalizedAndSavedContractsCount = mergedCount
-    newContractIds.push(...newContractIds)
+    allNewContractIds.push(...newContractIds)
   }
 
-  for (const contractId of newContractIds) {
+  for (const contractId of allNewContractIds) {
     await matchAndUpdateContractTags(priceService, contractId)
   }
 
@@ -391,17 +391,23 @@ const normalizeContract = async ({
   }
 }
 
-export const mergeAndSaveContracts = async (
-  contracts: UserContract[],
-): Promise<{
+export interface MergeAndSaveContractsResult {
   mergedCount: number
   newContractIds: string[]
-}> => {
+}
+
+export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
   const contractIds = contracts.map(c => c.ContractId)
   const normalizedContracts = await Promise.all(
     contracts.map(normalizeContract),
   )
   const validNormalizedContracts = compact(normalizedContracts)
+
+  const result: MergeAndSaveContractsResult = {
+    mergedCount: 0,
+    newContractIds: [],
+  }
+
   return await db.transaction(async trx => {
     const toInsert: ToInsertedContract[] = []
     const existingContracts = await trx('contracts')
@@ -409,13 +415,6 @@ export const mergeAndSaveContracts = async (
       .whereIn('ContractId', contractIds)
 
     const existingContractsById = keyBy(existingContracts, c => c.ContractId)
-    const result: {
-      mergedCount: number
-      newContractIds: string[]
-    } = {
-      mergedCount: 0,
-      newContractIds: [],
-    }
 
     for (const contract of validNormalizedContracts) {
       const existingContract = existingContractsById[contract.ContractId]
