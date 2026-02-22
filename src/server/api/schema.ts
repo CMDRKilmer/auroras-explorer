@@ -1,10 +1,10 @@
 import { type } from 'arktype'
 
 export const SetUserPlanetPlanSchema = type({
-  username: 'string',
+  username: 'string?',
   groupId: 'string',
-  planet: 'string',
-  plan: 'string',
+  planetId: 'string',
+  planId: 'string',
 })
 
 export type SetUserPlanetPlanSchema = typeof SetUserPlanetPlanSchema.infer

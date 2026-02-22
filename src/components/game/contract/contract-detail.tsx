@@ -8,7 +8,6 @@ import MdiCheck from '~icons/mdi/check'
 import MdiClose from '~icons/mdi/close'
 import { ContractType } from './components'
 import { ConditionBrief } from './condition-brief'
-import { ContractValidation } from './contract-validation'
 
 export const ContractDetail: FC<{
   contract: Contract
@@ -56,8 +55,6 @@ export const ContractDetail: FC<{
         {contract.DueDateEpochMs && (
           <span>Due: {formatTimeAdvanced(contract.DueDateEpochMs)}</span>
         )}
-
-        <ContractValidation contract={contract} />
       </div>
 
       <div className="mt-2 flex flex-col gap-1">

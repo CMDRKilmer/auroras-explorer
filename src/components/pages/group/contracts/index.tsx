@@ -7,6 +7,7 @@ import { ContractDetailInDataTable } from '@/components/game/contract/contract-d
 import { useGroupContractsPageContext } from './context'
 import { GroupContractsPageContextProvider } from './context-provider'
 import { Settings } from './settings'
+import { ContractPageTabs } from './tabs'
 
 const GroupContractsPageInner = () => {
   const { contractsQuery, table, pagination } = useGroupContractsPageContext()
@@ -14,6 +15,8 @@ const GroupContractsPageInner = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Contracts</h1>
+
+      <ContractPageTabs />
 
       <Settings />
 

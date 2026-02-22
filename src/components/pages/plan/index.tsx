@@ -1,29 +1,186 @@
 import { useQuery } from '@tanstack/react-query'
-import type { FC } from 'react'
+import { compact } from 'es-toolkit'
+import { type FC, useCallback, useMemo } from 'react'
+import { isHotkeyPressed } from 'react-hotkeys-hook'
 import { dialog } from 'redyc'
 import { inspect } from '@/components/common/dialog'
 import { AutoOpenDialog } from '@/components/common/dialog/auto-open-dialog'
+import { confirm } from '@/components/common/dialog/confirm'
+import { loadingDialog } from '@/components/common/dialog/loading-dialog'
 import { Button } from '@/components/ui/button'
 import { apiClient } from '@/lib/api'
+import { getPlanLinkFromId } from '@/lib/planner/util'
+import { queryClient } from '@/lib/query'
 import { groupPlansQuery } from '@/lib/query/group'
+import MdiClose from '~icons/mdi/close'
+import MdiEdit from '~icons/mdi/edit'
 import MdiLink from '~icons/mdi/link'
+import MdiPlus from '~icons/mdi/plus'
+import MdiTrash from '~icons/mdi/trash'
 import { SetUserPlanDialogContent } from './set-user-plan'
 
 export const GroupPlanPage: FC<{
   groupId: string
 }> = ({ groupId }) => {
-  const plans = useQuery(groupPlansQuery(groupId))
+  const { data: plans } = useQuery(groupPlansQuery(groupId))
+
+  const refetchPlans = useCallback(() => {
+    queryClient.invalidateQueries(groupPlansQuery(groupId))
+  }, [groupId])
+
+  const groupedPlans = useMemo(() => {
+    if (!plans) return []
+    return compact(Object.values(Object.groupBy(plans, plan => plan.planId)))
+  }, [plans])
+
   return (
     <div className="p-4">
       <div className="w-full flex justify-between ">
         <h1>Group Plans</h1>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-4">
+        {groupedPlans.map(plans => {
+          const plan = plans[0]
+          return (
+            <div
+              key={plan.id}
+              className="flex flex-col gap-2 px-4 py-2 border rounded-md group"
+            >
+              <div className="flex items-center gap-4">
+                <span className="font-medium text-sm">{plan.planetId}</span>
+                <span className="text-muted-foreground">{plan.planName}</span>
+                <Button
+                  variant="ghost"
+                  className="text-muted-foreground"
+                  asChild
+                >
+                  <a href={getPlanLinkFromId(plan.planId)} target="_blank">
+                    <MdiLink />
+                    Plan Link
+                  </a>
+                </Button>
+
+                <div className="flex items-center gap-1 text-sm text-muted-foreground opacity-0 group-hover:opacity-100 transition-all">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const ref = dialog(
+                        <AutoOpenDialog>
+                          <SetUserPlanDialogContent
+                            groupId={groupId}
+                            defaultValue={{
+                              planUrl: getPlanLinkFromId(plan.planId),
+                              username: plan.username,
+                            }}
+                            close={() => {
+                              ref.current?.close()
+                              refetchPlans()
+                            }}
+                          />
+                        </AutoOpenDialog>,
+                      )
+                    }}
+                  >
+                    <MdiEdit />
+                    Edit
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      const ok = await confirm()
+                      if (!ok) return
+                      const close = loadingDialog()
+                      await apiClient.delete(
+                        `/api/group/${groupId}/plan/${plan.id}`,
+                      )
+                      close()
+                      refetchPlans()
+                    }}
+                  >
+                    <MdiTrash />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {plans.map(plan => {
+                  return (
+                    // biome-ignore lint/a11y/noStaticElementInteractions: debug only
+                    // biome-ignore lint/a11y/useKeyWithClickEvents: debug only
+                    <div
+                      key={plan.username}
+                      onClick={() => {
+                        if (isHotkeyPressed('backquote')) {
+                          inspect(plan)
+                        }
+                      }}
+                      className="flex items-center gap-1 text-sm text-muted-foreground border rounded-md px-2 py-1 hover:text-muted-foreground/80 transition-all"
+                    >
+                      {plan.username}
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        onClick={async () => {
+                          const ok = await confirm()
+                          if (!ok) return
+                          const close = loadingDialog()
+                          await apiClient.delete(
+                            `/api/group/${groupId}/plan/${plan.id}`,
+                          )
+                          close()
+                          refetchPlans()
+                        }}
+                      >
+                        <MdiClose />
+                      </Button>
+                    </div>
+                  )
+                })}
+
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    const ref = dialog(
+                      <AutoOpenDialog>
+                        <SetUserPlanDialogContent
+                          groupId={groupId}
+                          defaultValue={{
+                            planUrl: getPlanLinkFromId(plan.planId),
+                            username: '',
+                          }}
+                          close={() => {
+                            ref.current?.close()
+                            refetchPlans()
+                          }}
+                        />
+                      </AutoOpenDialog>,
+                    )
+                  }}
+                >
+                  <MdiPlus />
+                  Add User
+                </Button>
+              </div>
+            </div>
+          )
+        })}
+
         <Button
+          className="w-full"
+          variant="outline"
           onClick={() => {
             const ref = dialog(
               <AutoOpenDialog>
                 <SetUserPlanDialogContent
                   groupId={groupId}
-                  close={() => ref.current?.close()}
+                  close={() => {
+                    ref.current?.close()
+                    refetchPlans()
+                  }}
                 />
               </AutoOpenDialog>,
             )
@@ -31,67 +188,6 @@ export const GroupPlanPage: FC<{
         >
           Add Plan
         </Button>
-      </div>
-
-      <div className="mt-4">
-        {plans.data?.length === 0 && (
-          <div className="text-muted-foreground">No plans found.</div>
-        )}
-
-        {plans.data?.map(plan => (
-          <div
-            key={plan.id}
-            className="p-4 border rounded-md mb-2 flex flex-col gap-2"
-          >
-            <div className="flex items-center gap-4">
-              {plan.planet}
-              <Button variant="link" className="p-0" asChild>
-                <a
-                  href={`https://prunplanner.org/shared/${plan.plan}`}
-                  target="_blank"
-                >
-                  <MdiLink />
-                  Plan Link
-                </a>
-              </Button>
-              <div>{plan.username}</div>
-              <Button
-                onClick={() => {
-                  inspect(plan)
-                }}
-              >
-                inspect
-              </Button>
-              <Button
-                onClick={() => {
-                  const ref = dialog(
-                    <AutoOpenDialog>
-                      <SetUserPlanDialogContent
-                        groupId={groupId}
-                        defaultValue={{
-                          plan: `https://prunplanner.org/shared/${plan.plan}`,
-                          username: plan.username,
-                        }}
-                        close={() => {
-                          ref.current?.close()
-                        }}
-                      />
-                    </AutoOpenDialog>,
-                  )
-                }}
-              >
-                edit
-              </Button>
-              <Button
-                onClick={() => {
-                  apiClient.delete(`/api/group/${groupId}/plan/${plan.id}`)
-                }}
-              >
-                delete
-              </Button>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   )

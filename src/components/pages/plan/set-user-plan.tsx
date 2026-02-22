@@ -1,4 +1,4 @@
-import { revalidateLogic, useForm, useStore } from '@tanstack/react-form'
+import { useForm, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { FC } from 'react'
 import { Button } from '@/components/ui/button'
@@ -19,13 +19,16 @@ import {
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { apiClient } from '@/lib/api'
+import { assert } from '@/lib/assert'
 import { getPlanIdFromLink } from '@/lib/planner/util'
+import { queryClient } from '@/lib/query'
+import { groupPlansQuery } from '@/lib/query/group'
 import { sharedPlanQuery } from '@/lib/query/plan'
 import { GroupMemberSelectSingle } from '../group/group-member-select'
 
 export interface SetUserPlanFormValues {
   username: string
-  plan: string
+  planUrl: string
 }
 
 export const SetUserPlanDialogContent: FC<{
@@ -35,27 +38,14 @@ export const SetUserPlanDialogContent: FC<{
 }> = ({ groupId, close, defaultValue }) => {
   const setUserPlan = useMutation({
     mutationKey: ['set-user-planet-plan', groupId],
-    mutationFn: async ({ username, plan }: SetUserPlanFormValues) => {
-      if (!username) {
-        form.setFieldMeta('username', old => ({
-          ...old,
-          errors: ['Username is required'],
-        }))
-        throw new Error('Username is required')
-      }
-      const planId = getPlanIdFromLink(plan)
-      if (!planId) {
-        form.setFieldMeta('plan', old => ({
-          ...old,
-          errors: ['Invalid plan link'],
-        }))
-        throw new Error('Username is required')
-      }
+    mutationFn: async ({ username, planUrl }: SetUserPlanFormValues) => {
+      const planId = getPlanIdFromLink(planUrl)
+      assert(planId, 'Invalid plan link')
 
       const res = await apiClient.post(`/api/group/${groupId}/plan`, {
         username: username.toUpperCase(),
-        plan: planId,
-        planet: planInfo.data?.baseplanner.planet_id,
+        planId,
+        planetId: planInfo.data?.baseplanner.planet_id,
         groupId,
       })
 
@@ -66,6 +56,7 @@ export const SetUserPlanDialogContent: FC<{
       return res.data
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(groupPlansQuery(groupId))
       close()
       form.reset()
     },
@@ -74,29 +65,14 @@ export const SetUserPlanDialogContent: FC<{
   const form = useForm({
     defaultValues: {
       username: defaultValue?.username || '',
-      plan: defaultValue?.plan || '',
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: ({ value }) => {
-        if (!value.username) {
-          return {
-            username: 'Username is required',
-          }
-        }
-        if (!value.plan) {
-          return {
-            plan: 'Plan link is required',
-          }
-        }
-      },
+      planUrl: defaultValue?.planUrl || '',
     },
     onSubmit: ({ value }) => {
       setUserPlan.mutate(value)
     },
   })
 
-  const planLink = useStore(form.store, state => state.values.plan)
+  const planLink = useStore(form.store, state => state.values.planUrl)
   const planId = getPlanIdFromLink(planLink)
   const planInfo = useQuery(sharedPlanQuery(planId))
 
@@ -125,7 +101,16 @@ export const SetUserPlanDialogContent: FC<{
 
       <FieldSet className="mt-4">
         <FieldGroup>
-          <form.Field name="username">
+          <form.Field
+            name="username"
+            validators={{
+              onSubmit: ({ value }) => {
+                if (!value) {
+                  return { message: 'Please select a user.' }
+                }
+              },
+            }}
+          >
             {field => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid
@@ -148,7 +133,20 @@ export const SetUserPlanDialogContent: FC<{
             }}
           </form.Field>
 
-          <form.Field name="plan">
+          <form.Field
+            name="planUrl"
+            validators={{
+              onSubmit: ({ value }) => {
+                if (!value) {
+                  return { message: 'Please enter the plan link.' }
+                }
+                const planId = getPlanIdFromLink(value)
+                if (!planId) {
+                  return { message: 'Invalid plan link.' }
+                }
+              },
+            }}
+          >
             {field => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid

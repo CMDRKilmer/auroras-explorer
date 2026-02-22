@@ -4,7 +4,6 @@ import { type Env, Hono } from 'hono'
 import { compress } from 'hono/compress'
 import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
-import { assert } from '@/lib/assert'
 import { config } from '../common/config'
 import { Context } from '../common/context'
 import { AppError } from '../common/error'
@@ -138,10 +137,9 @@ const setupRoutes = (app: Hono<Env>) => {
           'Group ID in path and body do not match',
         ).setStatusCode(400)
       }
-      const user = c.get('user')
-      assert(user)
+      const ctx = c.get('ctx')
 
-      const plan = await setUserPlanetPlan(params, user.username)
+      const plan = await setUserPlanetPlan(ctx, params)
       return c.json(plan)
     },
   )
@@ -149,8 +147,6 @@ const setupRoutes = (app: Hono<Env>) => {
   app.delete('/api/group/:groupId/plan/:planId', async c => {
     const groupId = c.req.param('groupId')
     const planId = c.req.param('planId')
-    const user = c.get('user')
-    assert(user)
 
     await deleteUserPlanetPlan(groupId, planId)
     return c.json({ success: true })

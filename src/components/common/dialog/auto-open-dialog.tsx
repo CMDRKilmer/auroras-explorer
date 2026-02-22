@@ -1,17 +1,21 @@
 import type { FC, ReactNode } from 'react'
 import { autoOpenModal } from 'redyc'
-import { Dialog as BaseDialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
-export const Dialog: FC<{
+export const DialogWrapper: FC<{
   open: boolean
   onClose?: () => void
   children: ReactNode
-}> = ({ open, onClose, children }) => {
+  className?: string
+  showCloseButton?: boolean
+}> = ({ open, onClose, children, className, showCloseButton }) => {
   return (
-    <BaseDialog open={open} onOpenChange={open => !open && onClose?.()}>
-      <DialogContent>{children}</DialogContent>
-    </BaseDialog>
+    <Dialog open={open} onOpenChange={open => !open && onClose?.()}>
+      <DialogContent className={className} showCloseButton={showCloseButton}>
+        {children}
+      </DialogContent>
+    </Dialog>
   )
 }
 
-export const AutoOpenDialog = autoOpenModal(Dialog)
+export const AutoOpenDialog = autoOpenModal(DialogWrapper)

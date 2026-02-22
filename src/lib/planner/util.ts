@@ -49,3 +49,7 @@ export const getPlanIdFromLink = (url?: string | undefined) => {
   const match = url?.match(re)
   return match?.[1]
 }
+
+export const getPlanLinkFromId = (planId: string) => {
+  return `https://prunplanner.org/shared/${planId}`
+}

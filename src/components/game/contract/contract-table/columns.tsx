@@ -8,6 +8,7 @@ import {
   ContractType,
   DueDateBadge,
 } from '../components'
+import { ContractValidation } from '../contract-validation'
 
 const columnHelper = createColumnHelper<Contract>()
 
@@ -50,6 +51,15 @@ export const columns = [
     },
   }),
 
+  columnHelper.display({
+    id: 'Valid',
+    header: 'Valid',
+    cell: row => {
+      const contract = row.row.original
+      return <ContractValidation contract={contract} />
+    },
+  }),
+
   columnHelper.accessor('Status', {
     id: 'Status',
     header: 'Status',
@@ -74,9 +84,9 @@ export const columns = [
     },
   }),
 
-  columnHelper.display({
-    id: 'Tags',
-  }),
+  // columnHelper.display({
+  //   id: 'Tags',
+  // }),
 
   columnHelper.accessor('DateEpochMs', {
     id: 'Created At',

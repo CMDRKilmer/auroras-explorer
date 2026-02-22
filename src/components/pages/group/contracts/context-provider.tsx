@@ -10,6 +10,7 @@ import type { DateRange } from 'react-day-picker'
 import { columns } from '@/components/game/contract/contract-table/columns'
 import { getDateRange } from '@/lib/date'
 import { groupContractsQuery } from '@/lib/query/contract'
+import { defaultColumnVisibility } from './column-visibility'
 import { StatusMap, TypesMap } from './constants'
 import { GroupContractsPageContext } from './context'
 
@@ -25,8 +26,11 @@ export const GroupContractsPageContextProvider: FC<{
   const [date, setDate] = useState<DateRange | undefined>(() =>
     getDateRange('today'),
   )
+  const [tags, setTags] = useState<string[]>([])
 
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    defaultColumnVisibility,
+  )
 
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -39,6 +43,7 @@ export const GroupContractsPageContextProvider: FC<{
       order: '-DateEpochMs',
       types: TypesMap[type],
       statuses: StatusMap[status],
+      tags: tags.length > 0 ? tags : undefined,
       usernames: usernames.length > 0 ? usernames : undefined,
       page: pagination.pageIndex + 1,
       pageSize: pagination.pageSize,
@@ -70,6 +75,8 @@ export const GroupContractsPageContextProvider: FC<{
       setType,
       status,
       setStatus,
+      tags,
+      setTags,
       date,
       setDate,
       contractsQuery,
@@ -81,6 +88,7 @@ export const GroupContractsPageContextProvider: FC<{
     type,
     usernames,
     status,
+    tags,
     date,
     contractsQuery,
     table,

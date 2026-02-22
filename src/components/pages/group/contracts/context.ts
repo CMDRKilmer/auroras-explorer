@@ -13,6 +13,8 @@ export const GroupContractsPageContext = createContext<{
   setType: (type: string) => void
   status: string
   setStatus: (status: string) => void
+  tags: string[]
+  setTags: (tags: string[]) => void
   date?: DateRange
   setDate: (date: DateRange | undefined) => void
   contractsQuery: UseQueryResult<Pagination<Contract>, Error>
@@ -29,6 +31,8 @@ export const GroupContractsPageContext = createContext<{
   setType: () => {},
   status: 'All',
   setStatus: () => {},
+  tags: [],
+  setTags: () => {},
   setDate: () => {},
   contractsQuery: {} as UseQueryResult<Pagination<Contract>, Error>,
   pagination: {

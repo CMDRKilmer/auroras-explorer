@@ -74,7 +74,7 @@ export const validateContract = (
 
   const contractPlanetId = normalizeAddress(location)
 
-  const plan = allPlans.find(plan => plan.planet === contractPlanetId)
+  const plan = allPlans.find(plan => plan.planetId === contractPlanetId)
 
   if (!plan) {
     return result
