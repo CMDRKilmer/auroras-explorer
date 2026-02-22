@@ -9,7 +9,8 @@ export const noCache: Cache = {
   async has() {
     return false
   },
-  async get() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async get<T>(_key: string): Promise<T | undefined> {
     return
   },
   async set() {

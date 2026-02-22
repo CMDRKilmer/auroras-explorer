@@ -7,6 +7,7 @@ import { ErrorPage } from './components/pages/error-page'
 import { NotFoundPage } from './components/pages/not-found-page'
 import { queryClient } from './lib/query'
 import { routeTree } from './routeTree.gen'
+import './assets/css/materials.css'
 
 // Create a new router instance
 const router = createRouter({ routeTree })

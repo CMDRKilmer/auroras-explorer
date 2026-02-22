@@ -36,7 +36,7 @@ export const useLocalStorage = <T>(key: string): T | undefined => {
   const [value, setValue] = useState(() => getItem<T>(key))
 
   useEffect(() => {
-    addEventListener('storage', event => {
+    addEventListener('storage', (event: StorageEvent) => {
       if (event.key === key) {
         setValue(getItem(key))
       }

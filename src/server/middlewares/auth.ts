@@ -1,10 +1,9 @@
 import { createMiddleware } from 'hono/factory'
-import type { Env } from '../api/types'
 import { isUserInGroup } from '../services/group'
 import { verifyToken } from '../services/user'
 
 export const authenticate = () =>
-  createMiddleware<Env>(async (c, next) => {
+  createMiddleware(async (c, next) => {
     const tokenHeader = c.req.header('Authorization')
     if (tokenHeader) {
       const match = tokenHeader.match(/^Bearer (.+) *$/)
@@ -21,7 +20,7 @@ export const authenticate = () =>
   })
 
 export const requireGroupAuth = () =>
-  createMiddleware<Env>(async (c, next) => {
+  createMiddleware(async (c, next) => {
     const groupId = c.req.param('groupId')
     if (groupId) {
       const user = c.get('user')
