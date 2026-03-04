@@ -396,8 +396,11 @@ export interface MergeAndSaveContractsResult {
   newContractIds: string[]
 }
 
+export const normalizeContractId = (contractId: string) =>
+  contractId.includes('-') ? contractId.split('-')[0] : contractId
+
 export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
-  const contractIds = contracts.map(c => c.ContractId)
+  const contractIds = contracts.map(c => normalizeContractId(c.ContractId))
   const normalizedContracts = await Promise.all(
     contracts.map(normalizeContract),
   )
@@ -417,9 +420,10 @@ export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
     const existingContractsById = keyBy(existingContracts, c => c.ContractId)
 
     for (const contract of validNormalizedContracts) {
-      const existingContract = existingContractsById[contract.ContractId]
+      const id = normalizeContractId(contract.ContractId)
+      const existingContract = existingContractsById[id]
       if (!existingContract) {
-        result.newContractIds.push(contract.ContractId)
+        result.newContractIds.push(id)
       }
       if (
         !existingContract ||
@@ -441,6 +445,7 @@ export const mergeAndSaveContracts = async (contracts: UserContract[]) => {
         toInsert.map(i => {
           return {
             ...i,
+            ContractId: normalizeContractId(i.ContractId),
             UpdatedAt: new Date(),
           }
         }),
