@@ -20,7 +20,7 @@ import TablerBrandDiscord from '~icons/tabler/brand-discord'
 import { NavMain } from './nav-main'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const dataUpdatedAt = useLocalStorage<number>('ct-orders')
+  const dataUpdatedAt = useLocalStorage<number>('ct:orders')
   const navigates = useNavigates()
   const identity = useIdentity()
 

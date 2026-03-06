@@ -5,7 +5,7 @@ import {
   getRecipesByInput,
   getRecipesByOutput,
 } from '@/components/pages/production-line/graph'
-import { RecipePreview } from '@/components/pages/production-line/recipe-preview'
+// import { RecipePreview } from '@/components/pages/production-line/recipe-preview'
 import { useGameData } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import { getMaterialCategoryTheme } from '../material-category'

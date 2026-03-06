@@ -18,6 +18,7 @@ const ensureFs = () => {
 }
 
 const getCachePath = (key: string) => `/data/${key}.json`
+const cacheSetTimeKey = (key: string) => `ct:${key}`
 const cacheExpireTimeKey = (key: string) => `ce:${key}`
 
 export const fsCache: Cache = {
@@ -46,7 +47,11 @@ export const fsCache: Cache = {
   },
   async set<T>(key: string, value: T, ttl?: number) {
     await ensureFs()
-    if (ttl) setItem(cacheExpireTimeKey(key), Date.now() + ttl)
+    if (ttl) {
+      setItem(cacheExpireTimeKey(key), Date.now() + ttl)
+      setItem(cacheSetTimeKey(key), Date.now())
+    }
+
     await fs.mkdir('/data').catch(() => {})
     await fs.writeFile(getCachePath(key), JSON.stringify(value), {
       encoding: 'utf8',
