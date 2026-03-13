@@ -17,6 +17,7 @@ import { queryClient } from '@/lib/query'
 import { identityQuery, useIdentity } from '@/lib/query/user'
 import MdiLogoutVariant from '~icons/mdi/logout-variant'
 import TablerBrandDiscord from '~icons/tabler/brand-discord'
+import TablerBrandGithub from '~icons/tabler/brand-github'
 import { NavMain } from './nav-main'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -72,6 +73,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <TablerBrandDiscord className="inline-block" /> PrUn Community
               Tools #auroras-explorer
+            </a>
+            <a
+              href="https://github.com/illustrix/auroras-explorer"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 underline"
+            >
+              <TablerBrandGithub className="inline-block" /> GitHub
             </a>
           </div>
         </div>
