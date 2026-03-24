@@ -45,3 +45,10 @@ export const exchangeFromFioToken = async (fioToken: string) => {
 
   return await genToken(username)
 }
+
+export const getUserFioApiToken = async (username: string) => {
+  return await db('users')
+    .where({ username })
+    .first()
+    .then(r => r?.fio_token)
+}

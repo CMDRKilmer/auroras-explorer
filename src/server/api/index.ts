@@ -8,9 +8,14 @@ import { config } from '../common/config'
 import { Context } from '../common/context'
 import { AppError } from '../common/error'
 import { logger } from '../common/logger'
-import { authenticate, requireGroupAuth } from '../middlewares/auth'
+import {
+  authenticate,
+  requireGroupAuth,
+  requireLogin,
+} from '../middlewares/auth'
 import { httpLogger } from '../middlewares/logger'
 import { Services } from '../services'
+import { createOrUpdateGroup, listMyGroups } from '../services/group'
 import { exchangeFromFioToken } from '../services/user'
 import { type ListContractsOptions, listContracts } from '../store/contract'
 import { getGroupUserInfos, getGroupUsernames } from '../store/group'
@@ -19,7 +24,7 @@ import {
   listGroupPlans,
   setUserPlanetPlan,
 } from '../store/plan'
-import { SetUserPlanetPlanSchema } from './schema'
+import { CreateOrUpdateGroupSchema, SetUserPlanetPlanSchema } from './schema'
 import { parseArray, parseRange } from './util'
 
 const createApp = () => {
@@ -62,6 +67,24 @@ const setupRoutes = (app: Hono<Env>) => {
   app.get('/api/identity', async c => {
     const user = c.get('user')
     return c.json(user)
+  })
+
+  app.post(
+    '/api/group',
+    requireLogin(),
+    sValidator('json', CreateOrUpdateGroupSchema),
+    async c => {
+      const params = c.req.valid('json')
+      const ctx = c.get('ctx')
+      const group = await createOrUpdateGroup(ctx, params)
+      return c.json(group)
+    },
+  )
+
+  app.get('/api/my/groups', requireLogin(), async c => {
+    const ctx = c.get('ctx')
+    const groups = await listMyGroups(ctx)
+    return c.json(groups)
   })
 
   // app.get('/api/user/:username/contracts', async c => {

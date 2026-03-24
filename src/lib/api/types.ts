@@ -1,4 +1,8 @@
-import type { ContractPO, UserContractConditionPO } from '@/server/store/type'
+import type {
+  ContractPO,
+  GroupPO,
+  UserContractConditionPO,
+} from '@/server/store/type'
 import type { BasePlanner } from '../planner/types'
 
 export interface Contract extends ContractPO {
@@ -18,6 +22,8 @@ export interface UserInfo {
   lastContSyncAt: string
   lastContSyncStatus: string
 }
+
+export interface Group extends Omit<GroupPO, 'fioApiToken'> {}
 
 export interface GroupPlan {
   id: string

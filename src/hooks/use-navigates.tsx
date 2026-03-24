@@ -6,9 +6,41 @@ import MdiCompassOutline from '~icons/mdi/compass-outline'
 import MdiDollar from '~icons/mdi/dollar'
 import MdiFileDocumentOutline from '~icons/mdi/file-document-outline'
 import MdiInvoiceListOutline from '~icons/mdi/invoice-list-outline'
+import MdiListBoxOutline from '~icons/mdi/list-box-outline'
 import MdiPlannerOutline from '~icons/mdi/planner-outline'
 
+export const useGroupTools = () => {
+  return [
+    {
+      title: 'Group Members',
+      url: '/group/{-$groupId}/members/',
+      icon: MdiAccountGroupOutline,
+      category: 'Group Tools',
+    },
+    {
+      title: 'Group Contracts',
+      url: '/group/{-$groupId}/contracts/',
+      icon: MdiInvoiceListOutline,
+      category: 'Group Tools',
+    },
+    {
+      title: 'Price Watch',
+      url: '/group/{-$groupId}/price-watch/',
+      icon: MdiDollar,
+      category: 'Group Tools',
+    },
+    {
+      title: 'Group Plan',
+      url: '/group/{-$groupId}/plan/',
+      icon: MdiPlannerOutline,
+      category: 'Group Tools',
+    },
+  ]
+}
+
 export const useNavigates = () => {
+  const groupTools = useGroupTools()
+
   return [
     {
       title: 'Shipment',
@@ -35,28 +67,11 @@ export const useNavigates = () => {
       category: 'Explorer Tools',
     },
     {
-      title: 'Group Members',
-      url: '/group/873386/members/',
-      icon: MdiAccountGroupOutline,
+      title: 'Group List',
+      url: '/group/',
+      icon: MdiListBoxOutline,
       category: 'Group Tools',
     },
-    {
-      title: 'Group Contracts',
-      url: '/group/873386/contracts/',
-      icon: MdiInvoiceListOutline,
-      category: 'Group Tools',
-    },
-    {
-      title: 'Price Watch',
-      url: '/group/873386/price-watch/',
-      icon: MdiDollar,
-      category: 'Group Tools',
-    },
-    {
-      title: 'Group Plan',
-      url: '/group/873386/plan/',
-      icon: MdiPlannerOutline,
-      category: 'Group Tools',
-    },
+    ...groupTools,
   ]
 }

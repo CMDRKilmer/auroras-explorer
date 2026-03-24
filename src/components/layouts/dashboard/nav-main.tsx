@@ -9,6 +9,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
+const PLACEHOLDER_GROUP_ID = '_'
+
 export function NavMain({
   items,
 }: {
@@ -20,6 +22,13 @@ export function NavMain({
   }[]
 }) {
   const matches = useMatches()
+
+  const groupId = useMemo(() => {
+    const match = matches.find(match => 'groupId' in match.params)
+    if (match) {
+      return (match.params as { groupId: string }).groupId
+    }
+  }, [matches])
 
   const groupedItems = useMemo(() => {
     const grouped = Object.groupBy(items, item => item.category ?? 'Other')
@@ -39,11 +48,15 @@ export function NavMain({
           <SidebarMenu>
             {group.items.map(item => {
               const isActive = matches.some(
-                match => match.pathname === item.url,
+                match => match.fullPath === item.url,
               )
 
               return (
-                <Link to={item.url} key={item.title}>
+                <Link
+                  to={item.url}
+                  key={item.title}
+                  params={{ groupId: groupId ?? PLACEHOLDER_GROUP_ID }}
+                >
                   <SidebarMenuItem>
                     <SidebarMenuButton isActive={isActive} tooltip={item.title}>
                       {item.icon && <item.icon />}

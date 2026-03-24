@@ -50,3 +50,14 @@ export type ContractPO = Omit<
 export type CompanyPO = Company & {
   UsernameUpper: string
 }
+
+export type GroupPO = {
+  id: string
+  name: string
+  fioGroupId: string
+  fioApiToken: string
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+  updatedBy: string
+}

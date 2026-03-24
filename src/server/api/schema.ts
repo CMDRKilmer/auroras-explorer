@@ -8,3 +8,12 @@ export const SetUserPlanetPlanSchema = type({
 })
 
 export type SetUserPlanetPlanSchema = typeof SetUserPlanetPlanSchema.infer
+
+export const CreateOrUpdateGroupSchema = type({
+  fioGroupId: 'string',
+  fioApiToken: 'string?',
+  useMyToken: 'boolean?',
+  name: 'string',
+})
+
+export type CreateOrUpdateGroupSchema = typeof CreateOrUpdateGroupSchema.infer

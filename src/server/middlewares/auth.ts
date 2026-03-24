@@ -9,13 +9,20 @@ export const authenticate = () =>
       const match = tokenHeader.match(/^Bearer (.+) *$/)
       if (!match) return c.json({ error: 'Unauthorized' }, 401)
       const token = match[1]
-      const username = await verifyToken(token)
+      const username = await verifyToken(token).catch(() => null)
       if (!username) return c.json({ error: 'Invalid token' }, 401)
       c.set('user', {
         username,
       })
     }
 
+    await next()
+  })
+
+export const requireLogin = () =>
+  createMiddleware(async (c, next) => {
+    const user = c.get('user')
+    if (!user) return c.json({ error: 'Unauthorized' }, 401)
     await next()
   })
 

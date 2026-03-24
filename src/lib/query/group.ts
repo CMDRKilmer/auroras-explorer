@@ -1,6 +1,16 @@
 import { queryOptions } from '@tanstack/react-query'
 import { apiClient } from '../api'
-import type { UserInfo, UserPlan } from '../api/types'
+import type { Group, UserInfo, UserPlan } from '../api/types'
+
+export const myGroupsQuery = () => {
+  return queryOptions({
+    queryKey: ['my-groups'],
+    queryFn: async () => {
+      const res = await apiClient.get<Group[]>('/api/my/groups')
+      return res.data
+    },
+  })
+}
 
 export const groupUsersQuery = (groupId: string) => {
   return queryOptions({
@@ -9,6 +19,7 @@ export const groupUsersQuery = (groupId: string) => {
       const res = await apiClient.get<UserInfo[]>(`/api/group/${groupId}/users`)
       return res.data
     },
+    enabled: !!groupId,
   })
 }
 

@@ -13,6 +13,7 @@ import { Route as ErrorRouteImport } from './routes/error'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShipmentIndexRouteImport } from './routes/shipment/index'
 import { Route as ProductionLineIndexRouteImport } from './routes/production-line/index'
+import { Route as GroupIndexRouteImport } from './routes/group/index'
 import { Route as CatalogIndexRouteImport } from './routes/catalog/index'
 import { Route as GroupChar123GroupIdChar125RouteRouteImport } from './routes/group/{-$groupId}/route'
 import { Route as GroupChar123GroupIdChar125PriceWatchIndexRouteImport } from './routes/group/{-$groupId}/price-watch/index'
@@ -38,6 +39,11 @@ const ShipmentIndexRoute = ShipmentIndexRouteImport.update({
 const ProductionLineIndexRoute = ProductionLineIndexRouteImport.update({
   id: '/production-line/',
   path: '/production-line/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupIndexRoute = GroupIndexRouteImport.update({
+  id: '/group/',
+  path: '/group/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogIndexRoute = CatalogIndexRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/error': typeof ErrorRoute
   '/group/{-$groupId}': typeof GroupChar123GroupIdChar125RouteRouteWithChildren
   '/catalog/': typeof CatalogIndexRoute
+  '/group/': typeof GroupIndexRoute
   '/production-line/': typeof ProductionLineIndexRoute
   '/shipment/': typeof ShipmentIndexRoute
   '/group/{-$groupId}/contracts/': typeof GroupChar123GroupIdChar125ContractsIndexRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/error': typeof ErrorRoute
   '/group/{-$groupId}': typeof GroupChar123GroupIdChar125RouteRouteWithChildren
   '/catalog': typeof CatalogIndexRoute
+  '/group': typeof GroupIndexRoute
   '/production-line': typeof ProductionLineIndexRoute
   '/shipment': typeof ShipmentIndexRoute
   '/group/{-$groupId}/contracts': typeof GroupChar123GroupIdChar125ContractsIndexRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/error': typeof ErrorRoute
   '/group/{-$groupId}': typeof GroupChar123GroupIdChar125RouteRouteWithChildren
   '/catalog/': typeof CatalogIndexRoute
+  '/group/': typeof GroupIndexRoute
   '/production-line/': typeof ProductionLineIndexRoute
   '/shipment/': typeof ShipmentIndexRoute
   '/group/{-$groupId}/contracts/': typeof GroupChar123GroupIdChar125ContractsIndexRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/error'
     | '/group/{-$groupId}'
     | '/catalog/'
+    | '/group/'
     | '/production-line/'
     | '/shipment/'
     | '/group/{-$groupId}/contracts/'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/error'
     | '/group/{-$groupId}'
     | '/catalog'
+    | '/group'
     | '/production-line'
     | '/shipment'
     | '/group/{-$groupId}/contracts'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/error'
     | '/group/{-$groupId}'
     | '/catalog/'
+    | '/group/'
     | '/production-line/'
     | '/shipment/'
     | '/group/{-$groupId}/contracts/'
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   ErrorRoute: typeof ErrorRoute
   GroupChar123GroupIdChar125RouteRoute: typeof GroupChar123GroupIdChar125RouteRouteWithChildren
   CatalogIndexRoute: typeof CatalogIndexRoute
+  GroupIndexRoute: typeof GroupIndexRoute
   ProductionLineIndexRoute: typeof ProductionLineIndexRoute
   ShipmentIndexRoute: typeof ShipmentIndexRoute
 }
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/production-line'
       fullPath: '/production-line/'
       preLoaderRoute: typeof ProductionLineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/group/': {
+      id: '/group/'
+      path: '/group'
+      fullPath: '/group/'
+      preLoaderRoute: typeof GroupIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalog/': {
@@ -266,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   GroupChar123GroupIdChar125RouteRoute:
     GroupChar123GroupIdChar125RouteRouteWithChildren,
   CatalogIndexRoute: CatalogIndexRoute,
+  GroupIndexRoute: GroupIndexRoute,
   ProductionLineIndexRoute: ProductionLineIndexRoute,
   ShipmentIndexRoute: ShipmentIndexRoute,
 }

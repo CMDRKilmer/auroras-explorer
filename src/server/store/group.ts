@@ -14,6 +14,11 @@ export const updateUserGroups = async (
     .insert(toInsert)
     .onConflict(['group_id', 'username'])
     .merge()
+
+  await db('user_groups')
+    .delete()
+    .where({ group_id: groupId })
+    .whereNotIn('username', usernames)
 }
 
 export const getGroupUsernames = async (groupId: string) => {
