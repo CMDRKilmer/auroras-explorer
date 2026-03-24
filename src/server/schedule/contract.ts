@@ -4,54 +4,54 @@ import { maxBy } from 'es-toolkit'
 import { FioClient } from '@/lib/fio/client'
 import { formatDuration } from '@/lib/format'
 import { sleep } from '@/lib/sleep'
-import { config } from '../common/config'
 import { logger } from '../common/logger'
-import { PriceService } from '../services/price'
+import type { PriceService } from '../services/price'
 import { bulkSaveUserContracts } from '../store/contract'
 import { updateUserGroups } from '../store/group'
 import { type SyncStatus, updateSyncStatus } from '../store/status'
 
+export interface GroupSyncConfig {
+  name: string
+  fioGroupId: string
+  fioApiToken: string
+}
+
 export class SaveUserContractTask {
   usernames: string[] = []
   lastExecutedAt = 0
-  running = false
   executeInterval = 10 * 60 * 1000 // 10 minutes
   fioClient: FioClient
 
-  priceService = new PriceService()
+  get tag() {
+    return `${this.group.name}(${this.group.fioGroupId})`
+  }
 
   constructor(
-    public groupId: string,
-    public token: string,
+    public group: GroupSyncConfig,
+    public priceService: PriceService,
   ) {
-    this.fioClient = new FioClient(token)
+    this.fioClient = new FioClient(group.fioApiToken)
   }
 
-  async init() {
-    logger.info('Initializing SaveUserContractTask...')
-    const group = await this.fioClient.getGroup(config.fio.groupId)
+  async refreshGroupUsers() {
+    const group = await this.fioClient.getGroup(this.group.fioGroupId)
     const usernames = group.GroupUsers.map(u => u.GroupUserName)
     this.usernames = usernames
-    await updateUserGroups(this.groupId, this.usernames)
-    logger.info(`Found ${this.usernames.length} users in group ${this.groupId}`)
-    await this.priceService.init()
+    await updateUserGroups(this.group.fioGroupId, this.usernames)
+    logger.info(`[${this.tag}] Refreshed ${this.usernames.length} users`)
   }
 
-  async run() {
-    if (this.running) return
-    this.running = true
-    await this.init()
-    while (this.running) {
-      const now = Date.now()
-      if (
-        this.lastExecutedAt === 0 ||
-        now - this.lastExecutedAt >= this.executeInterval
-      ) {
-        this.lastExecutedAt = now
-        await this.executeSaveUserContractTask()
-      }
-      await sleep(60 * 1000) // check every minute
-    }
+  async execute() {
+    await this.refreshGroupUsers()
+    this.lastExecutedAt = Date.now()
+    await this.executeSaveUserContractTask()
+  }
+
+  needsExecution() {
+    return (
+      this.lastExecutedAt === 0 ||
+      Date.now() - this.lastExecutedAt >= this.executeInterval
+    )
   }
 
   async saveUserContracts(username: string, signal?: AbortSignal) {
@@ -59,10 +59,9 @@ export class SaveUserContractTask {
       const contracts = await async.retry(
         {
           times: 5,
-          interval: (attemptCount: number) => 1000 * 2 ** attemptCount, // Exponential backoff: 2s, 4s, 8s, 16s, 32s
+          interval: (attemptCount: number) => 1000 * 2 ** attemptCount,
           errorFilter: (err: unknown) => {
             if (axios.isAxiosError(err)) {
-              // Retry for all errors except 401 Unauthorized, which indicates no permission to access the user's contracts
               return err.response?.status !== 401
             }
             return true
@@ -89,7 +88,7 @@ export class SaveUserContractTask {
 
       await updateSyncStatus(syncStatus)
       logger.info(
-        `Successfully saved contracts for user ${username}, result: ${JSON.stringify(result)}`,
+        `[${this.tag}] Saved contracts for ${username}: ${JSON.stringify(result)}`,
       )
 
       return result
@@ -108,7 +107,10 @@ export class SaveUserContractTask {
         return
       }
 
-      logger.error(`Failed to save contracts for user ${username}`, err)
+      logger.error(
+        `[${this.tag}] Failed to save contracts for ${username}`,
+        err,
+      )
 
       await updateSyncStatus({
         username,
@@ -130,23 +132,22 @@ export class SaveUserContractTask {
     }
 
     let timeout = false
-
     const abortController = new AbortController()
 
     const task = async () => {
       for (const username of this.usernames) {
-        if (timeout) {
-          break
-        }
-        logger.info(`Saving contracts for user ${username}`)
+        if (timeout) break
+        logger.info(`[${this.tag}] Saving contracts for ${username}`)
         const result = await this.saveUserContracts(
           username,
           abortController.signal,
         ).catch(err => {
-          logger.error(`Error in saveUserContracts for user ${username}`, err)
+          logger.error(
+            `[${this.tag}] Error in saveUserContracts for ${username}`,
+            err,
+          )
           return null
         })
-        logger.info(`Saved contracts for user ${username}`)
 
         if (result) {
           statistics.successCount++
@@ -163,18 +164,14 @@ export class SaveUserContractTask {
     await Promise.race([
       task().then(() => {
         logger.info(
-          `Finished executing SaveUserContractTask, statistics: ${JSON.stringify(
-            statistics,
-          )} Time taken: ${formatDuration(Date.now() - startTime)}`,
+          `[${this.tag}] Finished sync, stats: ${JSON.stringify(statistics)} Time: ${formatDuration(Date.now() - startTime)}`,
         )
       }),
       sleep(5 * 60 * 1000).then(() => {
         timeout = true
         abortController.abort()
         logger.warn(
-          `SaveUserContractTask execution timed out after 5 minutes. Current statistics: ${JSON.stringify(
-            statistics,
-          )}`,
+          `[${this.tag}] Sync timed out after 5 minutes. Stats: ${JSON.stringify(statistics)}`,
         )
       }),
     ])

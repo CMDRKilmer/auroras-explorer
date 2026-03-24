@@ -1,18 +1,14 @@
-import { config } from '../common/config'
-import { SaveUserContractTask } from './contract'
+import { logger } from '../common/logger'
+import { Scheduler } from './scheduler'
 
-export const main = async () => {
-  const task = new SaveUserContractTask(config.fio.groupId, config.fio.apiToken)
-
-  await task.run()
+const main = async () => {
+  const scheduler = new Scheduler()
+  await scheduler.init()
+  await scheduler.startListener()
+  await scheduler.run()
 }
 
-main()
-  .then(() => {
-    console.log('done')
-    process.exit(0)
-  })
-  .catch(err => {
-    console.error(err)
-    process.exit(1)
-  })
+main().catch(err => {
+  logger.error('Scheduler fatal error', err)
+  process.exit(1)
+})
