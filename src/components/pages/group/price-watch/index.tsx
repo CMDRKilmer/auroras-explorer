@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { type FC, useState } from 'react'
 import type { DateRange } from 'react-day-picker'
+import { LoadingPage } from '@/components/common/loading'
 import { Pagination } from '@/components/common/pagination'
 import { ContractPriceInsight } from '@/components/game/contract/contract-price-insight'
 import { DatePickerWithRange } from '@/components/ui/date-range-picker'
@@ -71,7 +72,7 @@ export const GroupPriceWatchPage: FC<{
             <div>No contracts found</div>
           )
         ) : (
-          <div>Loading...</div>
+          <LoadingPage />
         )}
       </div>
 

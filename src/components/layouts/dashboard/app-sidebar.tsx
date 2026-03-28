@@ -50,7 +50,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <div className="text-muted-foreground flex flex-col text-xs gap-4">
           <div>
-            <span>Data Updated:</span> <Time time={dataUpdatedAt ?? 0} />
+            <span>Data Updated:</span>{' '}
+            {dataUpdatedAt ? <Time time={dataUpdatedAt} /> : 'N/A'}
           </div>
           <span>
             Data Source:{' '}
