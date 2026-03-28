@@ -45,7 +45,7 @@ export const SetUserPlanDialogContent: FC<{
       const res = await apiClient.post(`/api/group/${groupId}/plan`, {
         username: username.toUpperCase(),
         planId,
-        planetId: planInfo.data?.baseplanner.planet_id,
+        planetId: planInfo.data?.plan_details.planet_natural_id,
         groupId,
       })
 
@@ -177,19 +177,19 @@ export const SetUserPlanDialogContent: FC<{
             <div className="flex gap-2 items-center">
               <div className="text-sm font-medium">Name</div>
               <div className="text-sm text-muted-foreground">
-                {planInfo.data.baseplanner.name}
+                {planInfo.data.plan_details.plan_name}
               </div>
             </div>
             <div className="flex gap-2 items-center">
               <div className="text-sm font-medium">Planet ID</div>
               <div className="text-sm text-muted-foreground">
-                {planInfo.data.baseplanner.planet_id}
+                {planInfo.data.plan_details.planet_natural_id}
               </div>
             </div>
             <div className="flex gap-2 items-center">
               <div className="text-sm font-medium">Buildings</div>
               <div className="flex gap-1 text-sm text-muted-foreground">
-                {planInfo.data.baseplanner.baseplanner_data.buildings.map(i => {
+                {planInfo.data.plan_details.plan_data.buildings.map(i => {
                   return (
                     <span key={i.name} className="">
                       {i.name} *{i.amount}

@@ -3,7 +3,6 @@ import type {
   GroupPO,
   UserContractConditionPO,
 } from '@/server/store/type'
-import type { BasePlanner } from '../planner/types'
 
 export interface Contract extends ContractPO {
   Conditions: UserContractConditionPO[]
@@ -33,7 +32,7 @@ export interface GroupPlan {
   createdAt: string
   updatedAt: string
   createdBy: string
-  data: BasePlanner
+  data: unknown
   buildings: string[]
   inputs: string[]
   outputs: string[]
