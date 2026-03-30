@@ -1,5 +1,10 @@
-import { createColumnHelper, type Table } from '@tanstack/react-table'
+import {
+  createColumnHelper,
+  type ColumnDef,
+  type Table,
+} from '@tanstack/react-table'
 import { sumBy } from 'es-toolkit'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { MaterialTile } from '@/components/game/material-tile'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,7 +25,7 @@ export const getRows = (table: Table<Acquisition>) => {
 export const useColumns = (props: { fromCX: string; toCX: string }) => {
   const { t } = useTranslation()
 
-  return [
+  return useMemo(() => [
     columnHelper.display({
       id: 'select',
       header: ({ table }) => (
@@ -160,5 +165,5 @@ export const useColumns = (props: { fromCX: string; toCX: string }) => {
         },
       },
     ),
-  ]
+  ] as ColumnDef<Acquisition>[], [t, props.fromCX, props.toCX])
 }

@@ -1,11 +1,10 @@
 import {
-  type ColumnDef,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { type FC, type ReactNode, useMemo, useState } from 'react'
 import { useGameData } from '@/lib/store'
-import { type Acquisition, getBestAcquisitions } from '@/lib/trade'
+import { getBestAcquisitions } from '@/lib/trade'
 import { ShipmentContext } from './context'
 import { useColumns } from './result-table/columns'
 
@@ -30,7 +29,7 @@ export const ShipmentContextProvider: FC<{ children: ReactNode }> = ({
     )
   }, [data, fromCX, toCX, weightCapacity, volumeCapacity])
 
-  const columns = useColumns({ fromCX, toCX }) as ColumnDef<Acquisition>[]
+  const columns = useColumns({ fromCX, toCX })
 
   const [rowSelection, setRowSelection] = useState({})
   const table = useReactTable({
@@ -58,6 +57,7 @@ export const ShipmentContextProvider: FC<{ children: ReactNode }> = ({
       table,
       columns,
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- table internally tracks rowSelection
   }, [fromCX, toCX, weightCapacity, volumeCapacity, rowSelection, result, table, columns])
 
   return (

@@ -1,4 +1,5 @@
 import { type FC, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   calculateRecipeDailyProfit,
   getInfraNeedsForBuilding,
@@ -11,6 +12,7 @@ import { MaterialTile } from '../../game/material-tile'
 import { useExplorerContext } from './context'
 
 export const RecipePreview: FC<{ recipe: Recipe }> = ({ recipe }) => {
+  const { t } = useTranslation()
   const { data } = useGameData()
   const { cx, setMat, setBuilding } = useExplorerContext()
   const dailyProfit = useMemo(() => {
@@ -27,7 +29,6 @@ export const RecipePreview: FC<{ recipe: Recipe }> = ({ recipe }) => {
     <div className="flex flex-col px-2 py-1 gap-1 rounded-md bg-secondary text-secondary-foreground cursor-default">
       <div className="flex items-center justify-between">
         <div className="flex items-baseline text-sm text-muted-foreground">
-          @
           <button
             type="button"
             className="text-accent-foreground hover:underline cursor-pointer"
@@ -67,7 +68,7 @@ export const RecipePreview: FC<{ recipe: Recipe }> = ({ recipe }) => {
           )
         })}
 
-        <div>⇨</div>
+        <div>{t('productionLine.recipe.arrow')}</div>
 
         {recipe.Outputs.map(output => {
           return (
@@ -84,7 +85,7 @@ export const RecipePreview: FC<{ recipe: Recipe }> = ({ recipe }) => {
       </div>
 
       <div className="text-sm text-muted-foreground">
-        Profit:{' '}
+        {t('productionLine.recipe.profit')}{' '}
         {dailyProfit ? (
           <>
             <span
@@ -98,10 +99,10 @@ export const RecipePreview: FC<{ recipe: Recipe }> = ({ recipe }) => {
             >
               ${dailyProfit.toLocaleString()}
             </span>
-            /day
+            {t('productionLine.recipe.perDay')}
           </>
         ) : (
-          'N/A'
+          t('productionLine.recipe.na')
         )}
       </div>
     </div>
