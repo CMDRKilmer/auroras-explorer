@@ -64,8 +64,7 @@ export const zh = {
       newGroup: '新建群组',
       empty: {
         title: '暂无群组',
-        description:
-          '您还没有加入任何群组。创建一个群组以开始与您的团队协作。',
+        description: '您还没有加入任何群组。创建一个群组以开始与您的团队协作。',
         createButton: '创建您的第一个群组',
       },
     },
@@ -74,8 +73,7 @@ export const zh = {
       editTitle: '编辑群组',
       createDescription:
         '链接一个 FIO 群组以开始追踪。您必须是 FIO 群组的管理员。',
-      editDescription:
-        '更新群组设置。您必须是 FIO 群组的管理员。',
+      editDescription: '更新群组设置。您必须是 FIO 群组的管理员。',
       nameLabel: '群组名称',
       namePlaceholder: '我的公司群组',
       nameRequired: '群组名称为必填项。',

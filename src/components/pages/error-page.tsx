@@ -7,7 +7,9 @@ export const ErrorPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
-        <h2 className="mb-6 text-5xl font-semibold">{t('errors.genericTitle')}</h2>
+        <h2 className="mb-6 text-5xl font-semibold">
+          {t('errors.genericTitle')}
+        </h2>
         <h3 className="mb-1.5 text-3xl font-semibold">{t('errors.generic')}</h3>
         <p className="text-muted-foreground mb-6 max-w-md">
           {t('errors.genericDescription')}

@@ -154,7 +154,9 @@ export const SetUserPlanDialogContent: FC<{
                 field.state.meta.isTouched && !field.state.meta.isValid
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>{t('plan.planLink')}</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    {t('plan.planLink')}
+                  </FieldLabel>
                   <Input
                     id={field.name}
                     value={field.state.value}
@@ -174,7 +176,9 @@ export const SetUserPlanDialogContent: FC<{
 
       {planInfo.data ? (
         <div className="mt-4 p-4 border rounded">
-          <div className="mb-2 text-sm text-muted-foreground">{t('plan.planInfo')}</div>
+          <div className="mb-2 text-sm text-muted-foreground">
+            {t('plan.planInfo')}
+          </div>
           <div className="flex flex-col gap-1">
             <div className="flex gap-2 items-center">
               <div className="text-sm font-medium">{t('plan.name')}</div>

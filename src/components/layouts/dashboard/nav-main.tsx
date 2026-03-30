@@ -33,7 +33,10 @@ export function NavMain({
   }, [matches])
 
   const groupedItems = useMemo(() => {
-    const grouped = Object.groupBy(items, item => item.categoryKey ?? 'nav.other')
+    const grouped = Object.groupBy(
+      items,
+      item => item.categoryKey ?? 'nav.other',
+    )
 
     return Object.entries(grouped).map(([categoryKey, items]) => ({
       categoryKey,
@@ -61,7 +64,10 @@ export function NavMain({
                   params={{ groupId: groupId ?? PLACEHOLDER_GROUP_ID }}
                 >
                   <SidebarMenuItem>
-                    <SidebarMenuButton isActive={isActive} tooltip={translatedTitle}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      tooltip={translatedTitle}
+                    >
                       {item.icon && <item.icon />}
                       <span>{translatedTitle}</span>
                     </SidebarMenuButton>

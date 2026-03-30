@@ -1,7 +1,4 @@
-import {
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { type FC, type ReactNode, useMemo, useState } from 'react'
 import { useGameData } from '@/lib/store'
 import { getBestAcquisitions } from '@/lib/trade'
@@ -58,7 +55,16 @@ export const ShipmentContextProvider: FC<{ children: ReactNode }> = ({
       columns,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- table internally tracks rowSelection
-  }, [fromCX, toCX, weightCapacity, volumeCapacity, rowSelection, result, table, columns])
+  }, [
+    fromCX,
+    toCX,
+    weightCapacity,
+    volumeCapacity,
+    rowSelection,
+    result,
+    table,
+    columns,
+  ])
 
   return (
     <ShipmentContext.Provider value={value}>

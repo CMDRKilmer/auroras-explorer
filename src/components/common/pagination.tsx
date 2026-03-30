@@ -62,7 +62,8 @@ export const Pagination = ({ table, pagination }: PaginationProps) => {
           <p className="text-muted-foreground text-sm" aria-live="polite">
             {t('pagination.page')}{' '}
             <span className="text-foreground">{pagination.pageIndex + 1}</span>{' '}
-            {t('pagination.of')} <span className="text-foreground">{table.getPageCount()}</span>
+            {t('pagination.of')}{' '}
+            <span className="text-foreground">{table.getPageCount()}</span>
           </p>
         </PaginationItem>
 

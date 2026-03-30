@@ -7,7 +7,11 @@ import { PriceService } from '../services/price'
 import { type GroupSyncConfig, SaveUserContractTask } from './contract'
 
 const loadGroupsFromDb = async (): Promise<GroupSyncConfig[]> => {
-  const rows = await db('groups').select('name', 'fio_group_id', 'fio_api_token')
+  const rows = await db('groups').select(
+    'name',
+    'fio_group_id',
+    'fio_api_token',
+  )
   return rows.map(r => ({
     name: r.name,
     fioGroupId: r.fio_group_id,

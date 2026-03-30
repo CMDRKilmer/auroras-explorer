@@ -46,14 +46,10 @@ export const ToolGalleryPage = () => {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold">{t('home.welcome')}</h1>
-      <p className="mt-4 text-muted-foreground">
-        {t('home.description')}
-      </p>
+      <p className="mt-4 text-muted-foreground">{t('home.description')}</p>
       <ToolsGallery tools={tools} />
 
-      <h2 className="mt-8 text-xl font-semibold">
-        {t('home.featuredTools')}
-      </h2>
+      <h2 className="mt-8 text-xl font-semibold">{t('home.featuredTools')}</h2>
       <p className="mt-4 text-muted-foreground">
         {t('home.featuredToolsDescription')}
       </p>

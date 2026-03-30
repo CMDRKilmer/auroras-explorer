@@ -60,12 +60,12 @@ export const en = {
     list: {
       title: 'Groups List',
       description:
-        'Hi, {{username}}. This is a collaboration tool for viewing and managing contracts and plans with your group members. You can create a group on FIO. Create a token and set it here, then you can view the group\'s contracts and plans, and manage them together.',
+        "Hi, {{username}}. This is a collaboration tool for viewing and managing contracts and plans with your group members. You can create a group on FIO. Create a token and set it here, then you can view the group's contracts and plans, and manage them together.",
       newGroup: 'New Group',
       empty: {
         title: 'No Groups Yet',
         description:
-          'You haven\'t joined any groups yet. Create a group to start collaborating with your team.',
+          "You haven't joined any groups yet. Create a group to start collaborating with your team.",
         createButton: 'Create Your First Group',
       },
     },
@@ -196,8 +196,9 @@ export const en = {
     currency: 'Currency',
     transformedResult: 'Transformed Result',
     sourceConfigJson: 'Source Config JSON',
-    pasteConfigHint: "Paste the XIT ACT config JSON to transform.",
-    noResultYet: 'No result yet. Paste a config and the result will appear here.',
+    pasteConfigHint: 'Paste the XIT ACT config JSON to transform.',
+    noResultYet:
+      'No result yet. Paste a config and the result will appear here.',
   },
   plan: {
     setUserPlanOnPlanet: 'Set User Plan on Planet',

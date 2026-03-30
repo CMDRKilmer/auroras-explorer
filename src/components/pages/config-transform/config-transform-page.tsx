@@ -101,7 +101,9 @@ export const ConfigTransformPage = () => {
             <form.Field name="location">
               {field => (
                 <Field>
-                  <FieldLabel htmlFor={field.name}>{t('configTransform.location')}</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    {t('configTransform.location')}
+                  </FieldLabel>
                   <Input
                     id={field.name}
                     value={field.state.value}
@@ -116,7 +118,9 @@ export const ConfigTransformPage = () => {
             <form.Field name="currency">
               {field => (
                 <Field>
-                  <FieldLabel htmlFor={field.name}>{t('configTransform.currency')}</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    {t('configTransform.currency')}
+                  </FieldLabel>
                   <Select
                     value={field.state.value}
                     onValueChange={field.handleChange}
